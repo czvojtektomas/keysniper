@@ -98,6 +98,8 @@ if (url == "edu" || url == "grp") {
                     showTitle();
                     console.clear();
                     ksEnabled = false;
+                } else if (e.ctrlKey && e.key == "Delete") {
+                    showHelp();
                 } else if (e.ctrlKey && e.keyCode == '38') {
                     const menu = document.getElementById("cdribbon");
                     if (menu.style.display == "none") {
