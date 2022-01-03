@@ -66,7 +66,7 @@ function showHelp() {
     }
 }
 const url = new URL(window.location).searchParams.get("cat");
-if (url == "edu" || url == "grp") {
+if (url == "edu" || url == "edu-typing" || url == "grp") {
     let errors, position, positionTemp, correct;
     function resetPage() {
         if (ksEnabled) {
@@ -160,7 +160,7 @@ if (url == "edu" || url == "grp") {
                     }
                     showTitle();
                 } else {
-                    if (url == "edu") {
+                    if (url == "edu" || url == "edu-typing") {
                         if (e.ctrlKey && e.keyCode == '37') {
                             document.getElementById("prevSnap").click();
                         } else if (e.ctrlKey && e.keyCode == '39') {
@@ -206,7 +206,7 @@ if (url == "edu" || url == "grp") {
                     position--;
                     correct = "NE";
                     if (correctType) {
-                        let rand = Math.round(Math.random() * correctTypeErrors);
+                        const rand = Math.round(Math.random() * correctTypeErrors);
                         if (rand == 0) {
                             e.preventDefault();
                             return false;
@@ -231,16 +231,12 @@ if (url == "edu" || url == "grp") {
                     positionTemp = position;
                 }
                 consoleOut("Platný znak: " + checkKeyWord(sentence[positionTemp]) + "  |  Zadaný znak: " + checkKeyWord(e.key) + "  |  Unicode: " + e.which + "  |  Správně: " + correct + "  |  KSindex: " + position);
-                if (autoNext) {
-                    if (document.getElementById("original").innerText.includes("Počet chyb:")) {
-                        document.getElementById("nextSnap").click();
-                    }
+                if (autoNext && document.getElementById("original").innerText.includes("Počet chyb:")) {
+                    document.getElementById("nextSnap").click();
                 }
                 const error = document.getElementById("correction").innerHTML.replace(/\s+/g, "");
-                if (autoRepeat) {
-                    if (error.length > errors) {
-                        document.getElementById("repeatSnap").click();
-                    }
+                if (autoRepeat && error.length > errors) {
+                    document.getElementById("repeatSnap").click();
                 }
                 if (error.length > errors) {
                     errors++;
@@ -249,7 +245,7 @@ if (url == "edu" || url == "grp") {
             }
         }
     });
-    if (url == "edu") {
+    if (url == "edu" || url == "edu-typing") {
         document.getElementById("prevSnap").addEventListener("click", function() {
             newSnap("předchozí");
         });
