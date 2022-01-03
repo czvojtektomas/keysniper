@@ -63,8 +63,9 @@ function showHelp() {
    `);
     }
 }
-const url = new URL(window.location).searchParams.get("cat");
-if (url == "edu" || url == "edu-typing" || url == "grp") {
+const pageUrl = new URL(window.location).searchParams.get("page");
+const catUrl = new URL(window.location).searchParams.get("cat");
+if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
     let errors, position, positionTemp, correct;
     function resetPage() {
         if (ksEnabled) {
@@ -154,7 +155,7 @@ if (url == "edu" || url == "edu-typing" || url == "grp") {
                     }
                     showTitle();
                 } else {
-                    if (url == "edu" || url == "edu-typing") {
+                    if (catUrl == "edu" || pageUrl == "edu-typing") {
                         if (e.ctrlKey && e.keyCode == '37') {
                             document.getElementById("prevSnap").click();
                         } else if (e.ctrlKey && e.keyCode == '39') {
@@ -172,7 +173,7 @@ if (url == "edu" || url == "edu-typing" || url == "grp") {
                         } else {
                             checkKey();
                         }
-                    } else if (url == "grp") {
+                    } else if (catUrl == "grp") {
                         if (e.ctrlKey && e.altKey) {
                             document.getElementById("repeatText").click();
                         } else {
@@ -225,7 +226,7 @@ if (url == "edu" || url == "edu-typing" || url == "grp") {
             }
         }
     });
-    if (url == "edu" || url == "edu-typing") {
+    if (catUrl == "edu" || pageUrl == "edu-typing") {
         document.getElementById("prevSnap").addEventListener("click", function() { newSnap("předchozí"); });
         document.getElementById("nextSnap").addEventListener("click", function() { newSnap("následující"); });
         document.getElementById("eduLection").addEventListener("change", function() { newSnap("lekci"); });
@@ -237,7 +238,7 @@ if (url == "edu" || url == "edu-typing" || url == "grp") {
         });
         document.getElementById("reverseSnap").addEventListener("click", function() { newSnap("snímek pozpátku"); });
         document.getElementById("errorSnap").addEventListener("click", function() { newSnap("snímek s chybnými slovy"); });
-    } else if (url == "grp") {
+    } else if (catUrl == "grp") {
         document.getElementById("forwardText").addEventListener("click", function() {
             resetPage();
             consoleOut("Text byl natažen");
