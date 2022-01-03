@@ -16,9 +16,7 @@ let showErrors = true; // zobrazování chyb v titulku stránky
 
 // kód
 function consoleOut(message) {
-    if (consoleOutput && ksEnabled) {
-        console.log("[KS] " + message);
-    }
+    if (consoleOutput && ksEnabled) console.log("[KS] " + message);
 }
 function showHelp() {
     if (ksEnabled) {
@@ -77,11 +75,7 @@ if (url == "edu" || url == "edu-typing" || url == "grp") {
         }
     }
     function showTitle() {
-        if (showErrors) {
-            document.title = errors + " ch";
-        } else {
-            document.title = "ATF - výuka psaní všemi deseti online bez reklam";
-        }
+        showErrors ? document.title = errors + " ch" : document.title = "ATF - výuka psaní všemi deseti online bez reklam";
     }
     function newSnap(word) {
         resetPage();
@@ -98,7 +92,7 @@ if (url == "edu" || url == "edu-typing" || url == "grp") {
                     showTitle();
                     console.clear();
                     ksEnabled = false;
-                } else if (e.ctrlKey && e.key == "Delete") {
+                } else if (e.ctrlKey && e.key == "Delete") { 
                     showHelp();
                 } else if (e.ctrlKey && e.keyCode == '38') {
                     const menu = document.getElementById("cdribbon");
@@ -190,18 +184,13 @@ if (url == "edu" || url == "edu-typing" || url == "grp") {
                 checkKey();
             }
             function checkKey() {
-                correct = "ANO";
                 const paper = document.getElementById("caret").innerText;
-                if (paper == "") {
-                    position = -1;
-                }
                 const sentence = document.getElementById("original").innerText;
+                const error = document.getElementById("correction").innerText.replace(/\s+/g, "");
+                correct = "ANO";
+                if (paper == "") position = -1;
                 position++;
-                if (sentence[position] == "¶") {
-                    if (e.key == "Enter") {
-                        return true;
-                    }
-                }
+                if (sentence[position] == "¶" && e.key == "Enter") return true;
                 if (sentence[position] != e.key) {
                     position--;
                     correct = "NE";
@@ -225,20 +214,11 @@ if (url == "edu" || url == "edu-typing" || url == "grp") {
                             return key;
                     }
                 }
-                if (correct == "NE") {
-                    positionTemp = position + 1;
-                } else {
-                    positionTemp = position;
-                }
+                correct == "NE" ? positionTemp = position + 1 : positionTemp = position;
                 consoleOut("Platný znak: " + checkKeyWord(sentence[positionTemp]) + "  |  Zadaný znak: " + checkKeyWord(e.key) + "  |  Unicode: " + e.which + "  |  Správně: " + correct + "  |  KSindex: " + position);
-                if (autoNext && document.getElementById("original").innerText.includes("Počet chyb:")) {
-                    document.getElementById("nextSnap").click();
-                }
-                const error = document.getElementById("correction").innerHTML.replace(/\s+/g, "");
-                if (autoRepeat && error.length > errors) {
-                    document.getElementById("repeatSnap").click();
-                }
+                if (autoNext && sentence.includes("Počet chyb:")) document.getElementById("nextSnap").click();
                 if (error.length > errors) {
+                    if (autoRepeat) document.getElementById("repeatSnap").click();
                     errors++;
                     showTitle();
                 }
@@ -246,31 +226,17 @@ if (url == "edu" || url == "edu-typing" || url == "grp") {
         }
     });
     if (url == "edu" || url == "edu-typing") {
-        document.getElementById("prevSnap").addEventListener("click", function() {
-            newSnap("předchozí");
-        });
-        document.getElementById("nextSnap").addEventListener("click", function() {
-            newSnap("následující");
-        });
-        document.getElementById("eduLection").addEventListener("change", function() {
-            newSnap("lekci");
-        });
-        document.getElementById("eduSublection").addEventListener("change", function() {
-            newSnap("část lekce");
-        });
-        document.getElementById("fileSnap").addEventListener("click", function() {
-            newSnap("text ze souboru");
-        });
+        document.getElementById("prevSnap").addEventListener("click", function() { newSnap("předchozí"); });
+        document.getElementById("nextSnap").addEventListener("click", function() { newSnap("následující"); });
+        document.getElementById("eduLection").addEventListener("change", function() { newSnap("lekci"); });
+        document.getElementById("eduSublection").addEventListener("change", function() { newSnap("část lekce"); });
+        document.getElementById("fileSnap").addEventListener("click", function() { newSnap("text ze souboru"); });
         document.getElementById("repeatSnap").addEventListener("click", function() {
             resetPage();
             consoleOut("Snímek byl obnoven");
         });
-        document.getElementById("reverseSnap").addEventListener("click", function() {
-            newSnap("snímek pozpátku");
-        });
-        document.getElementById("errorSnap").addEventListener("click", function() {
-            newSnap("snímek s chybnými slovy");
-        });
+        document.getElementById("reverseSnap").addEventListener("click", function() { newSnap("snímek pozpátku"); });
+        document.getElementById("errorSnap").addEventListener("click", function() { newSnap("snímek s chybnými slovy"); });
     } else if (url == "grp") {
         document.getElementById("forwardText").addEventListener("click", function() {
             resetPage();
