@@ -4,7 +4,7 @@
  * https://github.com/vojtektomascz/keysniper
  */
 
-// výchozí nastavení
+/* výchozí nastavení */
 let ksEnabled = true; // zapnutí/vypnutí všech funkcí KeySniperu
 let consoleOutput = true; // výstup příkazů do konzole
 let keyboardShortcuts = true; // klávesové zkratky
@@ -14,7 +14,7 @@ let correctType = false; // bezchybné psaní
 let correctTypeErrors = 0; // chybovost při bezchybném psaní (0 = vypnuto, číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
 let showErrors = true; // zobrazování chyb v titulku stránky
 
-// kód
+/* kód */
 function consoleOut(message) {
     if (consoleOutput && ksEnabled) console.log("[KS] " + message);
 }
