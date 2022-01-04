@@ -42,7 +42,7 @@ function showHelp() {
    @@@@*(               @@@@                *,@@@           Ctrl + Z          povolení/zakázání automatického opakování při chybě
    @@@@*%             @@@@@@@@@@@@@         (,@@@           Ctrl + ,          povolení/zakázání bezchybného psaní
    @@@@*%            @@@@@@@@@#  @          (,@@@           Ctrl + Q          povolení/zakázání zobrazování chyb v titulku stránky
-   @@@@*%            @@@@@,                 (,@@@           Ctrl + J          povolení/zobrazení automatického přepnutí snímku na následující po dokončení
+   @@@@*%            @@@@@,                 (,@@@           Ctrl + J          povolení/zákázání automatického přepnutí snímku na následující po dokončení
    @@@@*%            @@@@@@                 (,@@@           
    @@@@*%           @@@@ @@@@               (,@@@           
    @@@@*%           @@@    @@@              (,@@@           
