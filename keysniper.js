@@ -196,7 +196,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                     position--;
                     correct = "NE";
                     if (correctType) {
-                        const rand = Math.round(Math.random() * correctTypeErrors);
+                        let rand = Math.round(Math.random() * correctTypeErrors);
                         if (rand == 0) {
                             e.preventDefault();
                             return false;
