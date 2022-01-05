@@ -42,7 +42,7 @@ function showHelp() {
    @@@@*(               @@@@                *,@@@           Ctrl + Z          povolení/zakázání automatického opakování při chybě
    @@@@*%             @@@@@@@@@@@@@         (,@@@           Ctrl + ,          povolení/zakázání bezchybného psaní
    @@@@*%            @@@@@@@@@#  @          (,@@@           Ctrl + Q          povolení/zakázání zobrazování chyb v titulku stránky
-   @@@@*%            @@@@@,                 (,@@@           Ctrl + J          povolení/zákázání automatického přepnutí snímku na následující po dokončení
+   @@@@*%            @@@@@,                 (,@@@           Ctrl + M          povolení/zákázání automatického přepnutí snímku na následující po dokončení
    @@@@*%            @@@@@@                 (,@@@           
    @@@@*%           @@@@ @@@@               (,@@@           
    @@@@*%           @@@    @@@              (,@@@           
@@ -88,6 +88,16 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
     document.addEventListener("keydown", function (e) {
         if (ksEnabled) {
             if (keyboardShortcuts) {
+                function checkDisplay(item) {
+                    const itemID = document.getElementById(item);
+                    if (itemID.style.display == "none") {
+                        itemID.style.display = "";
+                        return false;
+                    } else {
+                        itemID.style.display = "none";
+                        return true;
+                    }
+                }
                 if (e.ctrlKey && e.shiftKey) {
                     showErrors = false;
                     showTitle();
@@ -96,23 +106,9 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                 } else if (e.ctrlKey && e.key == "Delete") { 
                     showHelp();
                 } else if (e.ctrlKey && e.keyCode == '38') {
-                    const menu = document.getElementById("cdribbon");
-                    if (menu.style.display == "none") {
-                        menu.style.display = "";
-                        consoleOut("ATF lišta byla odkryta");
-                    } else {
-                        menu.style.display = "none";
-                        consoleOut("ATF lišta byla skryta");
-                    }
+                    checkDisplay("cdribbon") ? consoleOut("ATF lišta byla skryta") : consoleOut("ATF lišta byla odkryta"); 
                 } else if (e.ctrlKey && e.keyCode == '40') {
-                    const keyboardHand = document.getElementById("board");
-                    if (keyboardHand.style.display == "none") {
-                        keyboardHand.style.display = "";
-                        consoleOut("Virtuální klávesnice byla odkryta");
-                    } else {
-                        keyboardHand.style.display = "none";
-                        consoleOut("Virtuální klávesnice byla skryta");
-                    }
+                    checkDisplay("board") ? consoleOut("Virtuální klávesnice byla skryta") : consoleOut("Virtuální klávesnice byla odkryta");
                 } else if (e.ctrlKey && e.key == "Enter") {
                     if (consoleOutput) {
                         consoleOut("Výpis do konzole byl zakázán");
@@ -160,7 +156,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                             document.getElementById("prevSnap").click();
                         } else if (e.ctrlKey && e.keyCode == '39') {
                             document.getElementById("nextSnap").click();
-                        } else if (e.ctrlKey && e.key == 'j') {
+                        } else if (e.ctrlKey && e.key == 'm') {
                             if (autoNext) {
                                 autoNext = false;
                                 consoleOut("Automatické přepnutí snímku po dokončení bylo zakázáno");
@@ -192,6 +188,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                 if (paper == "") position = -1;
                 position++;
                 if (sentence[position] == "¶" && e.key == "Enter") return true;
+                if (e.key == "F12") return true; 
                 if (sentence[position] != e.key) {
                     position--;
                     correct = "NE";
