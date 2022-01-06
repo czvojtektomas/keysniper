@@ -12,7 +12,7 @@ let autoNext = false; // automatické přepnutí po dokončení
 let autoRepeat = false; // automatické opakování při chybě
 let correctType = false; // bezchybné psaní
 let correctTypeErrors = 0; // chybovost při bezchybném psaní (0 = vypnuto, číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
-let showErrors = true; // zobrazování chyb v titulku stránky
+let showErrors = false; // zobrazování chyb v titulku stránky
 
 /* kód */
 function consoleOut(message) {
