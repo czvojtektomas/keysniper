@@ -5,14 +5,17 @@
  */
 
 /* výchozí nastavení */
-let ksEnabled = true; // zapnutí/vypnutí všech funkcí KeySniperu
-let consoleOutput = true; // výstup příkazů do konzole
-let keyboardShortcuts = true; // klávesové zkratky
-let autoNext = false; // automatické přepnutí po dokončení
-let autoRepeat = false; // automatické opakování při chybě
-let correctType = false; // bezchybné psaní
-let correctTypeErrors = 0; // chybovost při bezchybném psaní (0 = vypnuto, číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
-let showErrors = false; // zobrazování chyb v titulku stránky
+const settings = {
+    ksEnabled: true, // zapnutí/vypnutí všech funkcí KeySniperu
+    consoleOutput: true, // výstup příkazů do konzole
+    keyboardShortcuts: true, // klávesové zkratky
+    autoNext: false, // automatické přepnutí po dokončení
+    autoRepeat: false, // automatické opakování při chybě
+    correctType: false, // bezchybné psaní
+    correctTypeErrors: 0, // chybovost při bezchybném psaní (0 = vypnuto, číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
+    correctTypeErrorsEnabled: true, // zapnutí/vypnutí chybovosti
+    showErrors: false // zobrazování chyb v titulku stránky
+}
 
 /* kód */
 function consoleOut(message) {
@@ -43,7 +46,7 @@ function showHelp() {
    @@@@*%             @@@@@@@@@@@@@         (,@@@           Ctrl + ,          povolení/zakázání bezchybného psaní
    @@@@*%            @@@@@@@@@#  @          (,@@@           Ctrl + Q          povolení/zakázání zobrazování chyb v titulku stránky
    @@@@*%            @@@@@,                 (,@@@           Ctrl + M          povolení/zákázání automatického přepnutí snímku na následující po dokončení
-   @@@@*%            @@@@@@                 (,@@@           
+   @@@@*%            @@@@@@                 (,@@@           Ctrl + .          povolení/zakázání automatické chybovosti při bezchybném psaní
    @@@@*%           @@@@ @@@@               (,@@@           
    @@@@*%           @@@    @@@              (,@@@           
    @@@@*%         /@@@      @@@             (,@@@           
@@ -150,6 +153,14 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                         consoleOut("Zobrazování chyb v titulku stránky bylo povoleno");
                     }
                     showTitle();
+                } else if (e.ctrlKey && e.key == '.') {
+                    if (correctTypeErrorsEnabled) {
+                        correctTypeErrorsEnabled = false;
+                        consoleOut("Automatická chybovost byla zakázána");
+                    } else {
+                        correctTypeErrorsEnabled = true;
+                        consoleOut("Automatická chybovost byla povolena");
+                    }
                 } else {
                     if (catUrl == "edu" || pageUrl == "edu-typing") {
                         if (e.ctrlKey && e.keyCode == '37') {
@@ -193,7 +204,8 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                     position--;
                     correct = "NE";
                     if (correctType) {
-                        let rand = Math.round(Math.random() * correctTypeErrors);
+                        let rand;
+                        correctTypeErrorsEnabled ? rand = Math.round(Math.random() * correctTypeErrors) : rand = 0;
                         if (rand == 0) {
                             e.preventDefault();
                             return false;
