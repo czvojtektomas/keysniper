@@ -2,7 +2,7 @@
  * KeySniper (verze 1.0.1)
  * © Tomáš Vojtek 2021
  * https://github.com/vojtektomascz/keysniper
- */
+*/
 
 /* výchozí nastavení */
 const settings = {
@@ -14,15 +14,19 @@ const settings = {
     correctType: false, // bezchybné psaní
     correctTypeErrors: 0, // chybovost při bezchybném psaní (0 = vypnuto, číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
     correctTypeErrorsEnabled: true, // zapnutí/vypnutí chybovosti
-    showErrors: false // zobrazování chyb v titulku stránky
+    showErrors: false, // zobrazování chyb v titulku stránky
+    sendSnapErrorsFrom: 0.00, // 
+    sendSnapErrorsTo: 0.00, // 
+    sendSnapSpeedFrom: 200, //
+    sendSnapSpeedTo: 350 // 
 }
 
 /* kód */
 function consoleOut(message) {
-    if (consoleOutput && ksEnabled) console.log("[KS] " + message);
+    if (settings.consoleOutput && settings.ksEnabled) console.log("[KS] " + message);
 }
 function showHelp() {
-    if (ksEnabled) {
+    if (settings.ksEnabled) {
         console.log(`
     _  __           _____       _                 
    | |/ /          / ____|     (_)                             
@@ -47,7 +51,7 @@ function showHelp() {
    @@@@*%            @@@@@@@@@#  @          (,@@@           Ctrl + Q          povolení/zakázání zobrazování chyb v titulku stránky
    @@@@*%            @@@@@,                 (,@@@           Ctrl + M          povolení/zákázání automatického přepnutí snímku na následující po dokončení
    @@@@*%            @@@@@@                 (,@@@           Ctrl + .          povolení/zakázání automatické chybovosti při bezchybném psaní
-   @@@@*%           @@@@ @@@@               (,@@@           
+   @@@@*%           @@@@ @@@@               (,@@@           Ctrl + Space      odeslání aktuálního snímku
    @@@@*%           @@@    @@@              (,@@@           
    @@@@*%         /@@@      @@@             (,@@@           
    @@@@*%       /@@          @@             (,@@@             
@@ -61,25 +65,50 @@ function showHelp() {
        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@               
          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                 
            @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                   
-             @@@@@@@@@@@@@@@@@@@@@@@@@@                    
-   
+             @@@@@@@@@@@@@@@@@@@@@@@@@@                       
    `);
+    }
+}
+function sendSnap(username, lection, sublection, snap, speed, erroneous) {
+    if (settings.ksEnabled) {
+        if (username == undefined || isNaN(lection) || isNaN(sublection) || isNaN(snap)) {
+            consoleOut("Snímek se nepodařilo odeslat - zadali jste neplatné parametry!");
+        } else {
+            if (speed == null) speed = Math.trunc(Math.random() * (settings.sendSnapSpeedFrom - settings.sendSnapSpeedTo)) + settings.sendSnapSpeedTo;
+            if (erroneous == null) erroneous = parseFloat(Math.random() * (settings.sendSnapErrorsFrom - settings.sendSnapErrorsTo) + settings.sendSnapErrorsTo);
+            if (isNaN(speed) || isNaN(erroneous)) consoleOut("Snímek se nepodařilo odeslat - zadali jste neplatnou rychlost nebo chybovost!");
+            const xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    if (this.responseText.includes("nenalezen")) {
+                        consoleOut("Snímek se nepodařilo odeslat - uživatel nebyl nalezen v databázi!");
+                    } else if (this.responseText.includes("OK")) {
+                        consoleOut("Snímek byl úspěšně odeslán!");
+                    } else {
+                        consoleOut("Snímek se nepodařilo odeslat!");
+                    }
+                }
+            }
+            xhttp.open("GET", "https://www.atfonline.cz/saveSnapResult.php?username=" + username + "&normal=YES&lection=" + lection + "&sublection=" + sublection + "&snap=" + snap + "&fortime=-1&speed=" + speed + "&erroneous=" + erroneous.toFixed(2) + "&corrmode=YES", true);
+            xhttp.send();
+        }
     }
 }
 const pageUrl = new URL(window.location).searchParams.get("page");
 const catUrl = new URL(window.location).searchParams.get("cat");
 if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
-    let errors, position, positionTemp, correct;
+    let errors, position, positionTemp, correct, trueErrors, consoleOutputTemp;
     function resetPage() {
-        if (ksEnabled) {
+        if (settings.ksEnabled) {
             position = -1;
             positionTemp = -1;
             errors = 0;
+            trueErrors = 0;
             showTitle();
         }
     }
     function showTitle() {
-        showErrors ? document.title = errors + " ch" : document.title = "ATF - výuka psaní všemi deseti online bez reklam";
+        settings.showErrors ? document.title = errors + " ch" : document.title = "ATF - výuka psaní všemi deseti online bez reklam";
     }
     function newSnap(word) {
         resetPage();
@@ -89,8 +118,8 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
     showTitle();
     showHelp();
     document.addEventListener("keydown", function (e) {
-        if (ksEnabled) {
-            if (keyboardShortcuts) {
+        if (settings.ksEnabled) {
+            if (settings.keyboardShortcuts) {
                 function checkDisplay(item) {
                     const itemID = document.getElementById(item);
                     if (itemID.style.display == "none") {
@@ -101,11 +130,19 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                         return true;
                     }
                 }
+                function checkValue(value) {
+                    settings[value] = !settings[value];
+                    if (settings[value]) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
                 if (e.ctrlKey && e.shiftKey) {
-                    showErrors = false;
+                    settings.showErrors = false;
                     showTitle();
                     console.clear();
-                    ksEnabled = false;
+                    settings.ksEnabled = false;
                 } else if (e.ctrlKey && e.key == "Delete") { 
                     showHelp();
                 } else if (e.ctrlKey && e.keyCode == '38') {
@@ -113,54 +150,18 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                 } else if (e.ctrlKey && e.keyCode == '40') {
                     checkDisplay("board") ? consoleOut("Virtuální klávesnice byla skryta") : consoleOut("Virtuální klávesnice byla odkryta");
                 } else if (e.ctrlKey && e.key == "Enter") {
-                    if (consoleOutput) {
-                        consoleOut("Výpis do konzole byl zakázán");
-                        consoleOutput = false;
-                    } else {
-                        consoleOutput = true;
-                        consoleOut("Výpis do konzole byl povolen");
-                    }
+                    checkValue("consoleOutput") ? consoleOut("Výpis do konzole byl povolen") : consoleOut("Výpis do konzole byl zakázán");
                 } else if (e.ctrlKey && e.key == 'a') {
-                    if (keyboardShortcuts) {
-                        keyboardShortcuts = false;
-                        consoleOut("Klávesové zkratky byly zakázány");
-                    } else {
-                        keyboardShortcuts = true;
-                        consoleOut("Klávesové zkratky byly povoleny");
-                    }
+                    checkValue("keyboardShortcuts") ? consoleOut("Klávesové zkratky byly povoleny") : consoleOut("Klávesové zkratky byly zakázány");
                 } else if (e.ctrlKey && e.key == 'z') {
-                    if (autoRepeat) {
-                        autoRepeat = false;
-                        consoleOut("Automatické opakování snímku při chybě bylo zakázáno");
-                    } else {
-                        autoRepeat = true;
-                        consoleOut("Automatické opakování snímku při chybě bylo povoleno");
-                    }
+                    checkValue("autoRepeat") ? consoleOut("Automatické opakování snímku při chybě bylo povoleno") : consoleOut("Automatické opakování snímku při chybě bylo zakázáno");
                 } else if (e.ctrlKey && e.key == ',') {
-                    if (correctType) {
-                        correctType = false;
-                        consoleOut("Bezchybné psaní bylo zakázáno");
-                    } else {
-                        correctType = true;
-                        consoleOut("Bezchybné psaní bylo povoleno");
-                    }
+                    checkValue("correctType") ? consoleOut("Bezchybné psaní bylo povoleno") : consoleOut("Bezchybné psaní bylo zakázáno");
                 } else if (e.ctrlKey && e.key == 'q') {
-                    if (showErrors) {
-                        showErrors = false;
-                        consoleOut("Zobrazování chyb v titulku stránky bylo zakázáno");
-                    } else {
-                        showErrors = true;
-                        consoleOut("Zobrazování chyb v titulku stránky bylo povoleno");
-                    }
+                    checkValue("showErrors") ? consoleOut("Zobrazování chyb v titulku stránky bylo povoleno") : consoleOut("Zobrazování chyb v titulku stránky bylo zakázáno");
                     showTitle();
                 } else if (e.ctrlKey && e.key == '.') {
-                    if (correctTypeErrorsEnabled) {
-                        correctTypeErrorsEnabled = false;
-                        consoleOut("Automatická chybovost byla zakázána");
-                    } else {
-                        correctTypeErrorsEnabled = true;
-                        consoleOut("Automatická chybovost byla povolena");
-                    }
+                    checkValue("correctTypeErrorsEnabled") ? consoleOut("Automatická chybovost byla povolena") : consoleOut("Automatická chybovost byla zakázána");
                 } else {
                     if (catUrl == "edu" || pageUrl == "edu-typing") {
                         if (e.ctrlKey && e.keyCode == '37') {
@@ -168,15 +169,16 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                         } else if (e.ctrlKey && e.keyCode == '39') {
                             document.getElementById("nextSnap").click();
                         } else if (e.ctrlKey && e.key == 'm') {
-                            if (autoNext) {
-                                autoNext = false;
-                                consoleOut("Automatické přepnutí snímku po dokončení bylo zakázáno");
-                            } else {
-                                autoNext = true;
-                                consoleOut("Automatické přepnutí snímku po dokončení bylo povoleno");
-                            }
+                            checkValue("autoNext") ? consoleOut("Automatické přepnutí snímku po dokončení bylo povoleno") : consoleOut("Automatické přepnutí snímku po dokončení bylo zakázáno");
                         } else if (e.ctrlKey && e.altKey) {
                             document.getElementById("repeatSnap").click();
+                        } else if (e.ctrlKey && e.keyCode == '32') {
+                            let mess = document.getElementById("mess").innerText;
+                            let lection = parseInt(mess.match(/\d+/));
+                            let sublection = parseInt(document.getElementById("eduSublection").value);
+                            let snap;
+                            lection > 9 ? snap = parseInt(mess.replace(/[^0-9]/g, '')[2]) : snap = parseInt(mess.replace(/[^0-9]/g, '')[1]);
+                            sendSnap(eduProfile.userName, lection, sublection, snap, null, null);
                         } else {
                             checkKey();
                         }
@@ -198,19 +200,20 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                 correct = "ANO";
                 if (paper == "") position = -1;
                 position++;
-                if (sentence[position] == "¶" && e.key == "Enter") return true;
-                if (e.key == "F12") return true; 
+                if ((sentence[position] == "¶" && e.key == "Enter") || e.key == "F12" || e.key == "F5") return true;
                 if (sentence[position] != e.key) {
                     position--;
-                    correct = "NE";
-                    if (correctType) {
+                    trueErrors++;
+                    if (e.keyCode == '8' || e.ctrlKey) trueErrors--;
+                    if (settings.correctType) {
                         let rand;
-                        correctTypeErrorsEnabled ? rand = Math.round(Math.random() * correctTypeErrors) : rand = 0;
+                        settings.correctTypeErrorsEnabled ? rand = Math.round(Math.random() * settings.correctTypeErrors) : rand = 0;
                         if (rand == 0) {
                             e.preventDefault();
                             return false;
                         }
                     }
+                    correct = "NE";
                 }
                 function checkKeyWord(key) {
                     switch(key) {
@@ -225,13 +228,13 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                     }
                 }
                 correct == "NE" ? positionTemp = position + 1 : positionTemp = position;
-                consoleOut("Platný znak: " + checkKeyWord(sentence[positionTemp]) + "  |  Zadaný znak: " + checkKeyWord(e.key) + "  |  Unicode: " + e.which + "  |  Správně: " + correct + "  |  KSindex: " + position);
-                if (autoNext && sentence.includes("Počet chyb:")) document.getElementById("nextSnap").click();
+                if (settings.autoNext && sentence.includes("Počet chyb:")) document.getElementById("nextSnap").click();
                 if (error.length > errors) {
-                    if (autoRepeat) document.getElementById("repeatSnap").click();
+                    if (settings.autoRepeat) document.getElementById("repeatSnap").click();
                     errors++;
                     showTitle();
                 }
+                consoleOut("Platný znak: " + checkKeyWord(sentence[positionTemp]) + "  |  Zadaný znak: " + checkKeyWord(e.key) + "  |  Unicode: " + e.which + "  |  Správně: " + correct + "  |  KSindex: " + position + "  |  Počet chyb: " + errors + "  |  Počet pochybení: " + trueErrors);
             }
         }
     });
