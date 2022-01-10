@@ -1,5 +1,5 @@
 # KeySniper
-KeySniper je jednoduchý JavaScriptový program pro zjednoduššení práce s webovou aplikací ATF Online (www.atfonline.cz). Obsahuje hned několik funkcí, jakou je například bezchybné psaní, klávesové zkratky, automatické přepínání textu po dokončení, automatické opakování textu při chybě, zobrazování počtu chyb v reálném čase a další.
+KeySniper je jednoduchý JavaScriptový program pro zjednoduššení práce s webovou aplikací ATF Online (www.atfonline.cz). Obsahuje hned několik funkcí, jakou je například bezchybné psaní, přepisování výsledků, klávesové zkratky, automatické přepínání textu po dokončení, automatické opakování textu při chybě, zobrazování počtu chyb v reálném čase a další.
 
 
 <h2>Instalace</h2>
