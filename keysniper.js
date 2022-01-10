@@ -12,7 +12,7 @@ const settings = {
     autoNext: false, // automatické přepnutí po dokončení
     autoRepeat: false, // automatické opakování při chybě
     correctType: false, // bezchybné psaní
-    correctTypeErrors: 5, // chybovost při bezchybném psaní (číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
+    correctTypeErrors: 10, // chybovost při bezchybném psaní (číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
     correctTypeErrorsEnabled: false, // zapnutí/vypnutí chybovosti
     showErrors: false, // zobrazování chyb v titulku stránky
     sendSnapErrorsFrom: 0.00, // 
@@ -52,8 +52,8 @@ function showHelp() {
    @@@@*%            @@@@@,                 (,@@@           Ctrl + M          povolení/zákázání automatického přepnutí snímku na následující po dokončení
    @@@@*%            @@@@@@                 (,@@@           Ctrl + .          povolení/zakázání automatické chybovosti při bezchybném psaní
    @@@@*%           @@@@ @@@@               (,@@@           Ctrl + Space      odeslání aktuálního snímku
-   @@@@*%           @@@    @@@              (,@@@           
-   @@@@*%         /@@@      @@@             (,@@@           
+   @@@@*%           @@@    @@@              (,@@@           Shift + ↑         snížení pravděpodobnosti chyby o 1
+   @@@@*%         /@@@      @@@             (,@@@           Shift + ↓         zvýšení pravděpodobnosti chyby o 1
    @@@@*%       /@@          @@             (,@@@             
    @@@@*%                     @@@           (,@@@           
    @@@@*%**                               **(,@@@           
@@ -162,6 +162,11 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                     showTitle();
                 } else if (e.ctrlKey && e.key == '.') {
                     checkValue("correctTypeErrorsEnabled") ? consoleOut("Automatická chybovost byla povolena") : consoleOut("Automatická chybovost byla zakázána");
+                } else if (e.shiftKey && e.keyCode == '38') {
+                    settings.correctTypeErrors++;
+                } else if (e.shiftKey && e.keyCode == '40') {
+                    settings.correctTypeErrors--;
+                    if (settings.correctTypeErrors <= 0) settings.correctTypeErrors++;
                 } else {
                     if (catUrl == "edu" || pageUrl == "edu-typing") {
                         if (e.ctrlKey && e.keyCode == '37') {
@@ -206,6 +211,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                     trueErrors++;
                     if (e.keyCode == '8' || e.ctrlKey) trueErrors--;
                     if (settings.correctType) {
+                        if (settings.correctTypeErrors <= 0) correctTypeErrors = 1;
                         let rand;
                         settings.correctTypeErrorsEnabled ? rand = Math.trunc(Math.random() * settings.correctTypeErrors) : rand = 1;
                         if (rand > 0) {
