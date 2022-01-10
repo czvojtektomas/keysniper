@@ -1,6 +1,6 @@
 /**
  * KeySniper (verze 1.0.3)
- * © Tomáš Vojtek 2021
+ * © Tomáš Vojtek 2022
  * https://github.com/vojtektomascz/keysniper
 */
 
