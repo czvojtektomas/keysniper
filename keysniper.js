@@ -12,7 +12,7 @@ const settings = {
     autoNext: false, // automatické přepnutí po dokončení
     autoRepeat: false, // automatické opakování při chybě
     correctType: false, // bezchybné psaní
-    correctTypeErrors: 10, // chybovost při bezchybném psaní (číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
+    correctTypeErrors: 5, // chybovost při bezchybném psaní (číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
     correctTypeErrorsEnabled: false, // zapnutí/vypnutí chybovosti
     showErrors: false, // zobrazování chyb v titulku stránky
     sendSnapErrorsFrom: 0.00, // 
