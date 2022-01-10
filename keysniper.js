@@ -1,5 +1,5 @@
 /**
- * KeySniper (verze 1.0.1)
+ * KeySniper (verze 1.0.3)
  * © Tomáš Vojtek 2021
  * https://github.com/vojtektomascz/keysniper
 */
@@ -30,7 +30,7 @@ function showHelp() {
         console.log(`
     _  __           _____       _                 
    | |/ /          / ____|     (_)                             
-   | ' / ___ _   _| (___  _ __  _ _ __  ___ _ __            KeySniper (verze 1.0.1)
+   | ' / ___ _   _| (___  _ __  _ _ __  ___ _ __            KeySniper (verze 1.0.3)
    |  < / _ | | | ||___ || '_ || | '_ |/ _ | '__|           GitHub: https://github.com/vojtektomascz/keysniper
    | . ||  __/ |_| |____) | | | | | |_)|  __/ |             © Tomáš Vojtek 2021
    |_||_|___||__, |_____/|_| |_|_| .__/|___|_|              https://tomasvojtek.cz
