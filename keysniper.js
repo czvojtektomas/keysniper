@@ -32,7 +32,7 @@ function showHelp() {
    | |/ /          / ____|     (_)                             
    | ' / ___ _   _| (___  _ __  _ _ __  ___ _ __            KeySniper (verze 1.0.3)
    |  < / _ | | | ||___ || '_ || | '_ |/ _ | '__|           GitHub: https://github.com/vojtektomascz/keysniper
-   | . ||  __/ |_| |____) | | | | | |_)|  __/ |             © Tomáš Vojtek 2021
+   | . ||  __/ |_| |____) | | | | | |_)|  __/ |             © Tomáš Vojtek 2022
    |_||_|___||__, |_____/|_| |_|_| .__/|___|_|              https://tomasvojtek.cz
               __/ |              | |              
              |___/               |_|              
