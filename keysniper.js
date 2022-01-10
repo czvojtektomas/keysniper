@@ -207,8 +207,8 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                     if (e.keyCode == '8' || e.ctrlKey) trueErrors--;
                     if (settings.correctType) {
                         let rand;
-                        settings.correctTypeErrorsEnabled ? rand = Math.round(Math.random() * settings.correctTypeErrors) : rand = 0;
-                        if (rand == 0) {
+                        settings.correctTypeErrorsEnabled ? rand = Math.trunc(Math.random() * settings.correctTypeErrors) : rand = 1;
+                        if (rand > 0) {
                             e.preventDefault();
                             return false;
                         }
