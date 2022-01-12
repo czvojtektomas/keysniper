@@ -15,10 +15,10 @@ const settings = {
     correctTypeErrors: 10, // chybovost při bezchybném psaní (číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
     correctTypeErrorsEnabled: false, // zapnutí/vypnutí chybovosti
     showErrors: false, // zobrazování chyb v titulku stránky
-    sendSnapErrorsFrom: 0.00, // 
-    sendSnapErrorsTo: 0.00, // 
-    sendSnapSpeedFrom: 200, //
-    sendSnapSpeedTo: 350 // 
+    sendSnapErrorsFrom: 0.00, // náhodná chybovost falešně odeslaného snímku (od)
+    sendSnapErrorsTo: 0.00, // náhodná chybovost falešně odeslaného snímku (do)
+    sendSnapSpeedFrom: 200, // náhodná rychlost falešně odeslaného snímku (od)
+    sendSnapSpeedTo: 350 // náhodná rychlost falešně odeslaného snímku (do)
 }
 
 /* kód */
@@ -52,8 +52,8 @@ function showHelp() {
    @@@@*%            @@@@@,                 (,@@@           Ctrl + M          povolení/zákázání automatického přepnutí snímku na následující po dokončení
    @@@@*%            @@@@@@                 (,@@@           Ctrl + .          povolení/zakázání automatické chybovosti při bezchybném psaní
    @@@@*%           @@@@ @@@@               (,@@@           Ctrl + Space      odeslání aktuálního snímku
-   @@@@*%           @@@    @@@              (,@@@           Shift + ↑         snížení pravděpodobnosti chyby o 1
-   @@@@*%         /@@@      @@@             (,@@@           Shift + ↓         zvýšení pravděpodobnosti chyby o 1
+   @@@@*%           @@@    @@@              (,@@@           Shift + ↑         zvýšení pravděpodobnosti chyby během bezchybného psaní o 1
+   @@@@*%         /@@@      @@@             (,@@@           Shift + ↓         snížení pravděpodobnosti chyby během bezchybného psaní o 1
    @@@@*%       /@@          @@             (,@@@             
    @@@@*%                     @@@           (,@@@           
    @@@@*%**                               **(,@@@           
@@ -164,9 +164,11 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                     checkValue("correctTypeErrorsEnabled") ? consoleOut("Automatická chybovost byla povolena") : consoleOut("Automatická chybovost byla zakázána");
                 } else if (e.shiftKey && e.keyCode == '38') {
                     settings.correctTypeErrors++;
+                    consoleOut("Pravděpodobnost chybovosti byla navýšena o 1");
                 } else if (e.shiftKey && e.keyCode == '40') {
                     settings.correctTypeErrors--;
                     if (settings.correctTypeErrors <= 0) settings.correctTypeErrors++;
+                    consoleOut("Pravděpodobnost chybovosti byla snížena o 1");
                 } else {
                     if (catUrl == "edu" || pageUrl == "edu-typing") {
                         if (e.ctrlKey && e.keyCode == '37') {
