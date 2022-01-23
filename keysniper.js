@@ -207,7 +207,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                 correct = "ANO";
                 if (paper == "") position = -1;
                 position++;
-                if ((sentence[position] == "¶" && e.key == "Enter") || e.key == "F12" || e.key == "F5") return true;
+                if ((sentence[position] == "¶" && e.key == "Enter") || (sentence[position] == "—" && e.key == "-") || e.key == "F12" || e.key == "F5") return true;
                 if (sentence[position] != e.key) {
                     position--;
                     trueErrors++;
