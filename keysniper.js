@@ -217,9 +217,16 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                         let rand;
                         settings.correctTypeErrorsEnabled ? rand = Math.trunc(Math.random() * settings.correctTypeErrors) : rand = 1;
                         if (rand > 0) {
+                            if (settings.autoRepeat) document.getElementById("repeatSnap").click();
                             e.preventDefault();
                             return false;
                         }
+                    } else {
+                         if (settings.autoRepeat) {
+                             document.getElementById("repeatSnap").click();
+                             e.preventDefault();
+                             return false;
+                         }
                     }
                     correct = "NE";
                 }
@@ -238,7 +245,6 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                 correct == "NE" ? positionTemp = position + 1 : positionTemp = position;
                 if (settings.autoNext && sentence.includes("Počet chyb:")) document.getElementById("nextSnap").click();
                 if (error.length > errors) {
-                    if (settings.autoRepeat) document.getElementById("repeatSnap").click();
                     errors++;
                     showTitle();
                 }
