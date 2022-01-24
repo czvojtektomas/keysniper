@@ -217,7 +217,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                         let rand;
                         settings.correctTypeErrorsEnabled ? rand = Math.trunc(Math.random() * settings.correctTypeErrors) : rand = 1;
                         if (rand > 0) {
-                            if (settings.autoRepeat) document.getElementById("repeatSnap").click();
+                            if (settings.autoRepeat) document.getElementById("repeatSnap").click(); // dodělat shift
                             e.preventDefault();
                             return false;
                         }
