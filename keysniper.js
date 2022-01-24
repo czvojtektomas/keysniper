@@ -2,6 +2,11 @@
  * KeySniper (verze 1.0.3)
  * © Tomáš Vojtek 2022
  * https://github.com/vojtektomascz/keysniper
+ 
+ TO-DO:
+ - caps lock
+ - automatické přepínání snímku po konci
+ - přepisování znaků
 */
 
 /* výchozí nastavení */
@@ -207,7 +212,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                 correct = "ANO";
                 if (paper == "") position = -1;
                 position++;
-                if ((sentence[position] == "¶" && e.key == "Enter") || (sentence[position] == "—" && e.key == "-") || e.key == "F12" || e.key == "F5") return true;
+                if ((sentence[position] == "¶" && e.key == "Enter") || (sentence[position] == "—" && e.key == "-") || e.key == "F12" || e.key == "F5" || e.shiftKey) return true;
                 if (sentence[position] != e.key) {
                     position--;
                     trueErrors++;
@@ -217,7 +222,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                         let rand;
                         settings.correctTypeErrorsEnabled ? rand = Math.trunc(Math.random() * settings.correctTypeErrors) : rand = 1;
                         if (rand > 0) {
-                            if (settings.autoRepeat) document.getElementById("repeatSnap").click(); // dodělat shift
+                            if (settings.autoRepeat) document.getElementById("repeatSnap").click();
                             e.preventDefault();
                             return false;
                         }
