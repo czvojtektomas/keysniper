@@ -222,12 +222,12 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                         let rand;
                         settings.correctTypeErrorsEnabled ? rand = Math.trunc(Math.random() * settings.correctTypeErrors) : rand = 1;
                         if (rand > 0) {
-                            if (settings.autoRepeat) document.getElementById("repeatSnap").click();
+                            if (settings.autoRepeat && !e.shiftKey && e.keyCode != "20") document.getElementById("repeatSnap").click();
                             e.preventDefault();
                             return false;
                         }
                     } else {
-                         if (settings.autoRepeat) {
+                         if (settings.autoRepeat && !e.shiftKey && e.keyCode != "20") {
                              document.getElementById("repeatSnap").click();
                              e.preventDefault();
                              return false;
