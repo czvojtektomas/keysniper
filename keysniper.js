@@ -55,7 +55,7 @@ function showHelp() {
    @@@@*%             @@@@@@@@@@@@@         (,@@@           Ctrl + ,          povolení/zakázání bezchybného psaní
    @@@@*%            @@@@@@@@@#  @          (,@@@           Ctrl + Q          povolení/zakázání zobrazování chyb v titulku stránky
    @@@@*%            @@@@@,                 (,@@@           Ctrl + M          povolení/zákázání automatického přepnutí snímku na následující po dokončení
-   @@@@*%            @@@@@@                 (,@@@           Ctrl + .          povolení/zakázání automatické chybovosti při bezchybném psaní
+   @@@@*%            @@@@@@                 (,@@@           Ctrl + ;          povolení/zakázání automatické chybovosti při bezchybném psaní
    @@@@*%           @@@@ @@@@               (,@@@           Ctrl + Space      odeslání aktuálního snímku
    @@@@*%           @@@    @@@              (,@@@           Shift + ↑         zvýšení pravděpodobnosti chyby během bezchybného psaní o 1
    @@@@*%         /@@@      @@@             (,@@@           Shift + ↓         snížení pravděpodobnosti chyby během bezchybného psaní o 1
@@ -165,7 +165,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
                 } else if (e.ctrlKey && e.key == 'q') {
                     checkValue("showErrors") ? consoleOut("Zobrazování chyb v titulku stránky bylo povoleno") : consoleOut("Zobrazování chyb v titulku stránky bylo zakázáno");
                     showTitle();
-                } else if (e.ctrlKey && e.key == '.') {
+                } else if (e.ctrlKey && e.key == ';') {
                     checkValue("correctTypeErrorsEnabled") ? consoleOut("Automatická chybovost byla povolena") : consoleOut("Automatická chybovost byla zakázána");
                 } else if (e.shiftKey && e.keyCode == '38') {
                     settings.correctTypeErrors++;
