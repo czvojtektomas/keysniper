@@ -1,16 +1,10 @@
 /**
- * KeySniper (verze 1.0.3)
+ * KeySniper (verze 1.0.4)
  * © Tomáš Vojtek 2022
  * https://github.com/vojtektomascz/keysniper
- 
- TO-DO:
- - caps lock
- - automatické přepínání snímku po konci
- - přepisování znaků
- - performance mode
-*/
+ */
 
-/* výchozí nastavení */
+// výchozí nastavení
 const settings = {
   ksEnabled: true, // zapnutí/vypnutí všech funkcí KeySniperu
   consoleOutput: true, // výstup příkazů do konzole
@@ -20,14 +14,23 @@ const settings = {
   correctType: false, // bezchybné psaní
   correctTypeErrors: 10, // chybovost při bezchybném psaní (číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
   correctTypeErrorsEnabled: false, // zapnutí/vypnutí chybovosti
+  rewrite: false, // automatické přepisování chybných znaků při bezchybném psaní
+  autoRewrite: false,
   showErrors: false, // zobrazování chyb v titulku stránky
   sendSnapErrorsFrom: 0.0, // náhodná chybovost falešně odeslaného snímku (od)
   sendSnapErrorsTo: 0.0, // náhodná chybovost falešně odeslaného snímku (do)
   sendSnapSpeedFrom: 200, // náhodná rychlost falešně odeslaného snímku (od)
-  sendSnapSpeedTo: 350, // náhodná rychlost falešně odeslaného snímku (do)
+  sendSnapSpeedTo: 350 // náhodná rychlost falešně odeslaného snímku (do)
+};
+const core = {
+  version: "1.0.4",
+  updateServer: "https://vojtek.php5.cz/projects/updatechecker/check.php",
+  defaultChatServer: "https://vojtek.php5.cz/projects/keysniper/chat.php",
+  defaultFightServer: "https://vojtek.php5.cz/projects/keysniper/fight.php",
+  defaultFeedURL: "http://zsbludov.cz/rss.xml"
 };
 
-/* kód */
+// kód
 function consoleOut(message) {
   if (settings.consoleOutput && settings.ksEnabled)
     console.log("[KS] " + message);
@@ -35,45 +38,45 @@ function consoleOut(message) {
 function showHelp() {
   if (settings.ksEnabled) {
     console.log(`
-    _  __           _____       _                 
-   | |/ /          / ____|     (_)                             
-   | ' / ___ _   _| (___  _ __  _ _ __  ___ _ __            KeySniper (verze 1.0.3)
-   |  < / _ | | | ||___ || '_ || | '_ |/ _ | '__|           GitHub: https://github.com/vojtektomascz/keysniper
-   | . ||  __/ |_| |____) | | | | | |_)|  __/ |             © Tomáš Vojtek 2022
-   |_||_|___||__, |_____/|_| |_|_| .__/|___|_|              https://tomasvojtek.cz
-              __/ |              | |              
-             |___/               |_|              
-   
-             @@@@@@@@@@@@@@@@@@@@@@@@@@                     KLÁVESOVÉ ZKRATKY:
-           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                   Ctrl + Shift      kompletní vypnutí veškerých funkcí KeySniperu
-         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                 Ctrl + ↑          skrytí/odkrytí ATF lišty
-       @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@               Ctrl + ↓          skrytí/odkrytí virtuální klávesnice
-    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@              Ctrl + Del        zobrazení nápovědy
-   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           Ctrl + Alt        obnovení snímku
-   @@@@  ...                             ..   @@@           Ctrl + ←          přepnutí snímku na předchozí
-   @@@@,.*                                 , .@@@           Ctrl + →          přepnutí snímku na následující
-   @@@@,*                                   ,,@@@           Ctrl + Enter      povolení/zakázání výstupu do konzole
-   @@@@*(               @@@@                *,@@@           Ctrl + Z          povolení/zakázání automatického opakování při chybě
-   @@@@*%             @@@@@@@@@@@@@         (,@@@           Ctrl + ,          povolení/zakázání bezchybného psaní
-   @@@@*%            @@@@@@@@@#  @          (,@@@           Ctrl + Q          povolení/zakázání zobrazování chyb v titulku stránky
-   @@@@*%            @@@@@,                 (,@@@           Ctrl + M          povolení/zákázání automatického přepnutí snímku na následující po dokončení
-   @@@@*%            @@@@@@                 (,@@@           Ctrl + ;          povolení/zakázání automatické chybovosti při bezchybném psaní
-   @@@@*%           @@@@ @@@@               (,@@@           Ctrl + Space      odeslání aktuálního snímku
-   @@@@*%           @@@    @@@              (,@@@           Shift + ↑         zvýšení pravděpodobnosti chyby během bezchybného psaní o 1
-   @@@@*%         /@@@      @@@             (,@@@           Shift + ↓         snížení pravděpodobnosti chyby během bezchybného psaní o 1
-   @@@@*%       /@@          @@             (,@@@             
-   @@@@*%                     @@@           (,@@@           
-   @@@@*%**                               **(,@@@           
-   @@@@**%**//****,,,,,......,,,,,,,****/**%,*@@@         
-   @@@@#***&//****,,,,,.......,,,,,,****/%**,#@@@          
-   @@@@,@##*,,,,,,,.....     .....,,,,,,,*##@,@@@          
-   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           
-     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@             
-       @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@               
-         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                 
-           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                   
-             @@@@@@@@@@@@@@@@@@@@@@@@@@                       
-   `);
+         _  __           _____       _                 
+        | |/ /          / ____|     (_)                             
+        | ' / ___ _   _| (___  _ __  _ _ __  ___ _ __            KeySniper (verze ${core.version})
+        |  < / _ | | | ||___ || '_ || | '_ |/ _ | '__|           GitHub: https://github.com/vojtektomascz/keysniper
+        | . ||  __/ |_| |____) | | | | | |_)|  __/ |             © Tomáš Vojtek ${new Date().getFullYear()}
+        |_||_|___||__, |_____/|_| |_|_| .__/|___|_|              https://tomasvojtek.cz
+                   __/ |              | |              
+                  |___/               |_|              
+        
+                  @@@@@@@@@@@@@@@@@@@@@@@@@@                     KLÁVESOVÉ ZKRATKY:
+                @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                   Ctrl Shift      kompletní vypnutí veškerých funkcí KeySniperu
+              @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                 Ctrl ↑          skrytí/odkrytí ATF lišty
+            @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@               Ctrl ↓          skrytí/odkrytí virtuální klávesnice
+         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@              Ctrl Del        zobrazení nápovědy
+        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           Ctrl Alt        obnovení snímku
+        @@@@  ...                             ..   @@@           Ctrl ←          přepnutí snímku na předchozí
+        @@@@,.*                                 , .@@@           Ctrl →          přepnutí snímku na následující
+        @@@@,*                                   ,,@@@           Ctrl Enter      povolení/zakázání výstupu do konzole
+        @@@@*(               @@@@                *,@@@           Ctrl Z          povolení/zakázání automatického opakování při chybě
+        @@@@*%             @@@@@@@@@@@@@         (,@@@           Ctrl ,          povolení/zakázání bezchybného psaní
+        @@@@*%            @@@@@@@@@#  @          (,@@@           Ctrl Q          povolení/zakázání zobrazování chyb v titulku stránky
+        @@@@*%            @@@@@,                 (,@@@           Ctrl *          povolení/zákázání automatického přepnutí snímku na následující po dokončení
+        @@@@*%            @@@@@@                 (,@@@           Ctrl /          povolení/zakázání automatické chybovosti při bezchybném psaní
+        @@@@*%           @@@@ @@@@               (,@@@           Ctrl Space      odeslání aktuálního snímku
+        @@@@*%           @@@    @@@              (,@@@           Shift ↑         zvýšení pravděpodobnosti chyby během bezchybného psaní o 1
+        @@@@*%         /@@@      @@@             (,@@@           Shift ↓         snížení pravděpodobnosti chyby během bezchybného psaní o 1
+        @@@@*%       /@@          @@             (,@@@           Ctrl .          povolení/zakázání automatického přepisování chybných znaků  
+        @@@@*%                     @@@           (,@@@           Shift →         skrytí/odkrytí grafického rozhraní KeySniperu
+        @@@@*%**                               **(,@@@           Shift ←         skrytí/odkrytí widgetů
+        @@@@**%**//****,,,,,......,,,,,,,****/**%,*@@@           Ctrl A          povolení/zakázání klávesových zkratek
+        @@@@#***&//****,,,,,.......,,,,,,****/%**,#@@@           Ctrl ;          zkontrolovat aktualizace
+        @@@@,@##*,,,,,,,.....     .....,,,,,,,*##@,@@@       
+        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           
+          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@             
+            @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@               
+              @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                 
+                @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                   
+                  @@@@@@@@@@@@@@@@@@@@@@@@@@               
+       `);
   }
 }
 function sendSnap(username, lection, sublection, snap, speed, erroneous) {
@@ -142,13 +145,14 @@ function sendSnap(username, lection, sublection, snap, speed, erroneous) {
 const pageUrl = new URL(window.location).searchParams.get("page");
 const catUrl = new URL(window.location).searchParams.get("cat");
 if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
-  let errors, position, positionTemp, correct, trueErrors, consoleOutputTemp;
+  let index, position, positionTemp, errors, errorsTemp, correct;
   function resetPage() {
     if (settings.ksEnabled) {
+      index = -1;
       position = -1;
       positionTemp = -1;
       errors = 0;
-      trueErrors = 0;
+      errorsTemp = 0;
       showTitle();
     }
   }
@@ -166,29 +170,74 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
         document.getElementById("mess").innerText
     );
   }
+  function checkKeyWord(key) {
+    switch (key) {
+      case " ":
+        return "Space";
+        break;
+      case "¶":
+        return "Enter";
+        break;
+      default:
+        return key;
+    }
+  }
   resetPage();
   showTitle();
   showHelp();
+  let sentence, paper;
+  document.addEventListener("keypress", function (e) {
+    if (sentence[position] != e.key) {
+      if (settings.autoRepeat) {
+        if (catUrl == "edu" || pageUrl == "edu-typing") {
+          document.getElementById("repeatSnap").click();
+        } else if (catUrl == "grp") {
+          document.getElementById("repeatText").click();
+        }
+      }
+    }
+    showTitle();
+    consoleOut(
+      "Platný znak: " +
+        checkKeyWord(sentence[positionTemp]) +
+        "  |  Zadaný znak: " +
+        checkKeyWord(e.key) +
+        "  |  Unicode: " +
+        e.which +
+        "  |  Správně: " +
+        correct +
+        "  |  Pozice: " +
+        position +
+        "  |  Index: " +
+        index +
+        "  |  Počet chyb: " +
+        errors
+    );
+  });
   document.addEventListener("keydown", function (e) {
     if (settings.ksEnabled) {
       if (settings.keyboardShortcuts) {
-        function checkDisplay(item) {
+        function updateDisplay(item, text, t, f) {
           const itemID = document.getElementById(item);
+          let syntax = text + " ";
           if (itemID.style.display == "none") {
             itemID.style.display = "";
-            return false;
+            syntax += t;
           } else {
             itemID.style.display = "none";
-            return true;
+            syntax += f;
           }
+          return syntax;
         }
-        function checkValue(value) {
+        function updateSettings(value, text, t, f) {
           settings[value] = !settings[value];
+          let syntax = text + " ";
           if (settings[value]) {
-            return true;
+            syntax += t;
           } else {
-            return false;
+            syntax += f;
           }
+          return syntax;
         }
         if (e.ctrlKey && e.shiftKey) {
           settings.showErrors = false;
@@ -197,62 +246,48 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
           settings.ksEnabled = false;
         } else if (e.ctrlKey && e.key == "Delete") {
           showHelp();
-        } else if (e.ctrlKey && e.keyCode == "38") {
-          checkDisplay("cdribbon")
-            ? consoleOut("ATF lišta byla skryta")
-            : consoleOut("ATF lišta byla odkryta");
-        } else if (e.ctrlKey && e.keyCode == "40") {
-          checkDisplay("board")
-            ? consoleOut("Virtuální klávesnice byla skryta")
-            : consoleOut("Virtuální klávesnice byla odkryta");
+        } else if (e.ctrlKey && e.key == "ArrowUp") {
+          consoleOut(updateDisplay("cdribbon", "ATF lišta byla", "odkryta", "skryta"));
+        } else if (e.ctrlKey && e.key == "ArrowDown") {
+          consoleOut(updateDisplay("board", "Virtuální klávesnice byla", "odkryta", "skryta"));
         } else if (e.ctrlKey && e.key == "Enter") {
-          checkValue("consoleOutput")
-            ? consoleOut("Výpis do konzole byl povolen")
-            : consoleOut("Výpis do konzole byl zakázán");
+          if (settings.consoleOutput) {
+            consoleOut("Výpis do konzole byl zakázán");
+            settings.consoleOutput = false;
+          } else {
+            settings.consoleOutput = true;
+            consoleOut("Výpis do konzole byl povolen");
+          }
         } else if (e.ctrlKey && e.key == "a") {
-          checkValue("keyboardShortcuts")
-            ? consoleOut("Klávesové zkratky byly povoleny")
-            : consoleOut("Klávesové zkratky byly zakázány");
+          consoleOut(updateSettings("keyboardShortcuts", "Klávesové zkratky byly", "povoleny", "zakázány"));
         } else if (e.ctrlKey && e.key == "z") {
-          checkValue("autoRepeat")
-            ? consoleOut("Automatické opakování snímku při chybě bylo povoleno")
-            : consoleOut(
-                "Automatické opakování snímku při chybě bylo zakázáno"
-              );
+          consoleOut(updateSettings("autoRepeat", "Automatické opakování snímku při chybě bylo", "povoleno", "zakázáno"));
         } else if (e.ctrlKey && e.key == ",") {
-          checkValue("correctType")
-            ? consoleOut("Bezchybné psaní bylo povoleno")
-            : consoleOut("Bezchybné psaní bylo zakázáno");
+          consoleOut(updateSettings("correctType", "Bezchybné psaní bylo", "povoleno", "zakázáno"));
+        } else if (e.ctrlKey && e.key == ".") {
+          consoleOut(updateSettings("autoRewrite", "Automatické přepisování chybných znaků bylo", "povoleno", "zakázáno"));
         } else if (e.ctrlKey && e.key == "q") {
-          checkValue("showErrors")
-            ? consoleOut("Zobrazování chyb v titulku stránky bylo povoleno")
-            : consoleOut("Zobrazování chyb v titulku stránky bylo zakázáno");
+          consoleOut(updateSettings("showErrors", "Zobrazování chyb v titulku stránky bylo", "povoleno", "zakázáno"));
           showTitle();
-        } else if (e.ctrlKey && e.key == ";") {
-          checkValue("correctTypeErrorsEnabled")
-            ? consoleOut("Automatická chybovost byla povolena")
-            : consoleOut("Automatická chybovost byla zakázána");
-        } else if (e.shiftKey && e.keyCode == "38") {
+        } else if (e.ctrlKey && e.key == "/") {
+          consoleOut(updateSettings("correctTypeErrorsEnabled", "Automatická chybovost byla", "povolena", "zakázána"));
+        } else if (e.shiftKey && e.key == "ArrowUp") {
           settings.correctTypeErrors++;
           consoleOut("Pravděpodobnost chybovosti byla navýšena o 1");
-        } else if (e.shiftKey && e.keyCode == "40") {
+        } else if (e.shiftKey && e.key == "ArrowDown") {
           settings.correctTypeErrors--;
           if (settings.correctTypeErrors <= 0) settings.correctTypeErrors++;
           consoleOut("Pravděpodobnost chybovosti byla snížena o 1");
+        } else if (e.ctrlKey && e.key == ";") {
+          checkUpdates();
         } else {
           if (catUrl == "edu" || pageUrl == "edu-typing") {
             if (e.ctrlKey && e.keyCode == "37") {
               document.getElementById("prevSnap").click();
             } else if (e.ctrlKey && e.keyCode == "39") {
               document.getElementById("nextSnap").click();
-            } else if (e.ctrlKey && e.key == "m") {
-              checkValue("autoNext")
-                ? consoleOut(
-                    "Automatické přepnutí snímku po dokončení bylo povoleno"
-                  )
-                : consoleOut(
-                    "Automatické přepnutí snímku po dokončení bylo zakázáno"
-                  );
+            } else if (e.ctrlKey && e.key == "*") {
+              console(updateSettings("autoNext", "Automatické přepnutí snímku po dokončení bylo", "povoleno", "zakázáno"));
             } else if (e.ctrlKey && e.altKey) {
               document.getElementById("repeatSnap").click();
             } else if (e.ctrlKey && e.keyCode == "32") {
@@ -282,89 +317,60 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
             } else {
               checkKey();
             }
+          } else {
+            checkKey();
           }
         }
       } else {
         checkKey();
       }
       function checkKey() {
-        const paper = document.getElementById("caret").innerText;
-        const sentence = document.getElementById("original").innerText;
-        const error = document
-          .getElementById("correction")
-          .innerText.replace(/\s+/g, "");
-        correct = "ANO";
-        if (paper == "") position = -1;
-        position++;
-        if (
-          (sentence[position] == "¶" && e.key == "Enter") ||
-          (sentence[position] == "—" && e.key == "-") ||
-          e.key == "F12" ||
-          e.key == "F5"
-        )
-          return true;
-        if (sentence[position] != e.key) {
-          position--;
-          trueErrors++;
-          if (e.keyCode == "8" || e.ctrlKey) trueErrors--;
-          if (settings.correctType) {
-            if (settings.correctTypeErrors <= 0) correctTypeErrors = 1;
-            let rand;
-            settings.correctTypeErrorsEnabled
-              ? (rand = Math.trunc(Math.random() * settings.correctTypeErrors))
-              : (rand = 1);
-            if (rand > 0) {
-              if (settings.autoRepeat && !e.shiftKey && e.keyCode != "20")
-                document.getElementById("repeatSnap").click();
-              e.preventDefault();
-              return false;
-            }
-          } else {
-            if (settings.autoRepeat && !e.shiftKey && e.keyCode != "20") {
-              document.getElementById("repeatSnap").click();
-              e.preventDefault();
-              return false;
-            }
-          }
-          correct = "NE";
-        }
-        function checkKeyWord(key) {
-          switch (key) {
-            case " ":
-              return "mezera";
-              break;
-            case "¶":
-              return "enter";
-              break;
-            default:
-              return key;
-          }
-        }
-        correct == "NE"
-          ? (positionTemp = position + 1)
-          : (positionTemp = position);
-        if (settings.autoNext && sentence.includes("Počet chyb:"))
-          document.getElementById("nextSnap").click();
-        if (error.length > errors) {
+        const error = document.getElementById("correction").innerText.replace(/\s+/g, "").length;
+        if (error > errorsTemp) {
           errors++;
-          showTitle();
+          errorsTemp++;
         }
-        consoleOut(
-          "Platný znak: " +
-            checkKeyWord(sentence[positionTemp]) +
-            "  |  Zadaný znak: " +
-            checkKeyWord(e.key) +
-            "  |  Unicode: " +
-            e.which +
-            "  |  Správně: " +
-            correct +
-            "  |  KSindex: " +
-            position +
-            "  |  Počet chyb: " +
-            errors +
-            "  |  Počet pochybení: " +
-            trueErrors
-        );
+        sentence = document.getElementById("original").innerText;
+        if (settings.autoNext && sentence.includes("Počet chyb:")) {
+          document.getElementById("nextSnap").click();
+        } else {
+          paper = document.getElementById("caret").innerText;
+          correct = "ANO";
+          if (paper == "") {
+            position = -1;
+            errorsTemp = 0;
+          }
+          index++;
+          position++;
+          if (
+            (sentence[position] == "¶" && e.key == "Enter") ||
+            (sentence[position] == "—" && e.key == "-") ||
+            e.key == "F5" ||
+            e.key == "F12"
+          )
+            return true;
+          if (sentence[position] != e.key) {
+            index--;
+            position--;
+            if (settings.correctType) {
+              if (settings.correctTypeErrors <= 0) correctTypeErrors = 1;
+              let rand;
+              settings.correctTypeErrorsEnabled
+                ? (rand = Math.trunc(
+                    Math.random() * settings.correctTypeErrors
+                  ))
+                : (rand = 1);
+              if (rand > 0) {
+                e.preventDefault();
+                return false;
+              }
+            }
+            correct = "NE";
+          }
+          correct == "NE"
+            ? (positionTemp = position + 1)
+            : (positionTemp = position);
+        }
       }
     }
   });
@@ -402,6 +408,10 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
     document.getElementById("errorSnap").addEventListener("click", function () {
       newSnap("snímek s chybnými slovy");
     });
+    document.getElementById("corrMode").addEventListener("click", function () {
+      resetPage();
+      consoleOut("");
+    })
   } else if (catUrl == "grp") {
     document
       .getElementById("forwardText")
@@ -421,4 +431,21 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
     'KeySniper funguje pouze na stránkách "Výuka CS Qwertz" a "Skupiny"'
   );
 }
+function checkUpdates() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      if (this.responseText == "update") {
+        consoleOut("Je k dispozici nová verze KeySniperu, stáhnout jí můžete zde: https://github.com/vojtektomascz/keysniper");
+      } else if (this.responseText == "ok") {
+        consoleOut("Používáte nejnovější verzi KeySniperu");
+      } else {
+        consoleOut("Nepodařilo se připojit k aktualizačnímu serveru, tudíž nemohly být ověřeny nové aktualizace.");
+      }
+    }
+  }
+  xhttp.open("GET", core.updateServer + "?project=keysniper&version=" + core.version, true);
+  xhttp.send();
+}
+checkUpdates();
 consoleOut("KeySniper byl úspěšně načten!");
