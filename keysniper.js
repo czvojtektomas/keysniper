@@ -14,20 +14,22 @@ const settings = {
   correctType: false, // bezchybné psaní
   correctTypeErrors: 10, // chybovost při bezchybném psaní (číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
   correctTypeErrorsEnabled: false, // zapnutí/vypnutí chybovosti
-  rewrite: false, // automatické přepisování chybných znaků při bezchybném psaní
-  autoRewrite: false,
-  showErrors: false, // zobrazování chyb v titulku stránky
+  rewrite: false, // přepisování chybných znaků při bezchybném psaní - v přípravě
+  autoRewrite: false, // automatické přepisování chybných znaků při bezchybném psaní - v přípravě
+  showTab: false, // zobrazování chyb, rychlosti a času v titulku stránky
   sendSnapErrorsFrom: 0.0, // náhodná chybovost falešně odeslaného snímku (od)
   sendSnapErrorsTo: 0.0, // náhodná chybovost falešně odeslaného snímku (do)
   sendSnapSpeedFrom: 200, // náhodná rychlost falešně odeslaného snímku (od)
-  sendSnapSpeedTo: 350 // náhodná rychlost falešně odeslaného snímku (do)
+  sendSnapSpeedTo: 350, // náhodná rychlost falešně odeslaného snímku (do)
 };
 const core = {
-  version: "1.0.4",
-  updateServer: "https://vojtek.php5.cz/projects/updatechecker/check.php",
-  defaultChatServer: "https://vojtek.php5.cz/projects/keysniper/chat.php",
-  defaultFightServer: "https://vojtek.php5.cz/projects/keysniper/fight.php",
-  defaultFeedURL: "http://zsbludov.cz/rss.xml"
+  version: "1.0.4", // verze KeySniperu
+  updateChannel: "stable", // aktualizační kanál
+  updateServer: "https://vojtek.php5.cz/projects/updatechan/update.php", // aktualizační server
+  defaultChatServer: "https://vojtek.php5.cz/projects/keysniper/chat.php", // server pro chat
+  defaultFightServer: "https://vojtek.php5.cz/projects/keysniper/fight.php", // server pro fight
+  defaultBrowserSite: "https://www.bing.com", // výchozí webová stránka pro integrovaný prohlížeč
+  defaultFeedURL: "https://hn.cz/?p=000000_rss", // výchozí adresa pro RSS feed
 };
 
 // kód
@@ -40,7 +42,9 @@ function showHelp() {
     console.log(`
          _  __           _____       _                 
         | |/ /          / ____|     (_)                             
-        | ' / ___ _   _| (___  _ __  _ _ __  ___ _ __            KeySniper (verze ${core.version})
+        | ' / ___ _   _| (___  _ __  _ _ __  ___ _ __            KeySniper (verze ${
+          core.version
+        })
         |  < / _ | | | ||___ || '_ || | '_ |/ _ | '__|           GitHub: https://github.com/vojtektomascz/keysniper
         | . ||  __/ |_| |____) | | | | | |_)|  __/ |             © Tomáš Vojtek ${new Date().getFullYear()}
         |_||_|___||__, |_____/|_| |_|_| .__/|___|_|              https://tomasvojtek.cz
@@ -144,8 +148,33 @@ function sendSnap(username, lection, sublection, snap, speed, erroneous) {
 }
 const pageUrl = new URL(window.location).searchParams.get("page");
 const catUrl = new URL(window.location).searchParams.get("cat");
+function openBackend() {
+  const xhttp = new XMLHttpRequest();
+  if (catUrl == "edu" || pageUrl == "edu-typing") {
+    xhttp.open("GET", "https://vojtek.php5.cz/projects/keysniper/backend.php?type=edu&user="+sessionStorage.getItem("logUserName")+"&data="+sessionStorage.getItem("logUserPass")+"&disKey=" + eduProfile.disKey + "&disHand=" + eduProfile.disHand + "&selKey=" + eduProfile.selKey + "&corrMode=" + eduProfile.corrMode + "&genSnap=" + eduProfile.genSnap + "&errorSound=" + eduProfile.errorSound + "&lec=" + eduProfile.lec + "&sub=" + eduProfile.sub + "&snap=" + eduProfile.snap + "&hardKey=" + eduProfile.hardKey + "&playMode=" + eduProfile.playMode + "&moveMode=" + eduProfile.moveMode + "&timeMin=" + eduProfile.timeMin, true);
+  } else if (catUrl == "grp") {
+    xhttp.open("GET", "https://vojtek.php5.cz/projects/keysniper/backend.php?type=grp&user=" + sessionStorage.getItem("logUserName") + "&data=" + sessionStorage.getItem("logUserPass") + "&class=" + groupProfile.groupName + "&autoResult=" + groupProfile.autoResult + "&disKey=" + groupProfile.disKey + "&disHand=" + groupProfile.disHand + "&selKey=" + groupProfile.selKey + "&hardKey=" + groupProfile.hardKey, true);
+  }
+  xhttp.send();
+}
+openBackend();
+function changeIdentity(username) {
+  sessionStorage.setItem("logUserName", username);
+  document.getElementById("username").innerText = username;
+  if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "game") {
+    eduProfile.userName = username;
+  } else if (catUrl == "grp") {
+    groupProfile.userName = username;
+    groupProfile.userNameGroup = username;
+    document.getElementById("groupStudent").innerText = username;
+  } else if (catUrl == "rss") {
+    rssProfile.userName = username;
+  }
+  alert("Identita uživatele byla úspěšně změněna!");
+}
+//changeIdentity(prompt("Zadejte uživatelské jméno:"));
 if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
-  let index, position, positionTemp, errors, errorsTemp, correct;
+  let index, position, positionTemp, errors, errorsTemp, trueErrors, correct;
   function resetPage() {
     if (settings.ksEnabled) {
       index = -1;
@@ -153,22 +182,20 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
       positionTemp = -1;
       errors = 0;
       errorsTemp = 0;
+      trueErrors = 0;
       showTitle();
     }
   }
   function showTitle() {
-    settings.showErrors
-      ? (document.title = errors + " ch")
+    settings.showTab
+      ? (document.title = errors + " ch | " + speed + " úh/m |" + time)
       : (document.title = "ATF - výuka psaní všemi deseti online bez reklam");
   }
   function newSnap(word) {
     resetPage();
-    consoleOut(
-      "Snímek byl přepnut na " +
-        word +
-        " => " +
-        document.getElementById("mess").innerText
-    );
+    let msg = document.getElementById("mess").innerText;
+    msg.includes("Lekce") ? (msg = "=> " + msg) : (msg = "");
+    consoleOut("Snímek byl přepnut na " + word + " " + msg);
   }
   function checkKeyWord(key) {
     switch (key) {
@@ -185,6 +212,9 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
   resetPage();
   showTitle();
   showHelp();
+  document.addEventListener("resize", function () {
+    resetPage();
+  });
   let sentence, paper;
   document.addEventListener("keypress", function (e) {
     if (sentence[position] != e.key) {
@@ -210,7 +240,9 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
         position +
         "  |  Index: " +
         index +
-        "  |  Počet chyb: " +
+        "  |  Počet chyb před opravou: " +
+        trueErrors +
+        "  |  Počet chyb po opravě: " +
         errors
     );
   });
@@ -240,16 +272,25 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
           return syntax;
         }
         if (e.ctrlKey && e.shiftKey) {
-          settings.showErrors = false;
+          settings.showTab = false;
           showTitle();
           console.clear();
           settings.ksEnabled = false;
         } else if (e.ctrlKey && e.key == "Delete") {
           showHelp();
         } else if (e.ctrlKey && e.key == "ArrowUp") {
-          consoleOut(updateDisplay("cdribbon", "ATF lišta byla", "odkryta", "skryta"));
+          consoleOut(
+            updateDisplay("cdribbon", "ATF lišta byla", "odkryta", "skryta")
+          );
         } else if (e.ctrlKey && e.key == "ArrowDown") {
-          consoleOut(updateDisplay("board", "Virtuální klávesnice byla", "odkryta", "skryta"));
+          consoleOut(
+            updateDisplay(
+              "board",
+              "Virtuální klávesnice byla",
+              "odkryta",
+              "skryta"
+            )
+          );
         } else if (e.ctrlKey && e.key == "Enter") {
           if (settings.consoleOutput) {
             consoleOut("Výpis do konzole byl zakázán");
@@ -259,18 +300,60 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
             consoleOut("Výpis do konzole byl povolen");
           }
         } else if (e.ctrlKey && e.key == "a") {
-          consoleOut(updateSettings("keyboardShortcuts", "Klávesové zkratky byly", "povoleny", "zakázány"));
+          consoleOut(
+            updateSettings(
+              "keyboardShortcuts",
+              "Klávesové zkratky byly",
+              "povoleny",
+              "zakázány"
+            )
+          );
         } else if (e.ctrlKey && e.key == "z") {
-          consoleOut(updateSettings("autoRepeat", "Automatické opakování snímku při chybě bylo", "povoleno", "zakázáno"));
+          consoleOut(
+            updateSettings(
+              "autoRepeat",
+              "Automatické opakování snímku při chybě bylo",
+              "povoleno",
+              "zakázáno"
+            )
+          );
         } else if (e.ctrlKey && e.key == ",") {
-          consoleOut(updateSettings("correctType", "Bezchybné psaní bylo", "povoleno", "zakázáno"));
+          consoleOut(
+            updateSettings(
+              "correctType",
+              "Bezchybné psaní bylo",
+              "povoleno",
+              "zakázáno"
+            )
+          );
         } else if (e.ctrlKey && e.key == ".") {
-          consoleOut(updateSettings("autoRewrite", "Automatické přepisování chybných znaků bylo", "povoleno", "zakázáno"));
+          consoleOut(
+            updateSettings(
+              "autoRewrite",
+              "Automatické přepisování chybných znaků bylo",
+              "povoleno",
+              "zakázáno"
+            )
+          );
         } else if (e.ctrlKey && e.key == "q") {
-          consoleOut(updateSettings("showErrors", "Zobrazování chyb v titulku stránky bylo", "povoleno", "zakázáno"));
+          consoleOut(
+            updateSettings(
+              "showTab",
+              "Zobrazování informací v titulku stránky bylo",
+              "povoleno",
+              "zakázáno"
+            )
+          );
           showTitle();
         } else if (e.ctrlKey && e.key == "/") {
-          consoleOut(updateSettings("correctTypeErrorsEnabled", "Automatická chybovost byla", "povolena", "zakázána"));
+          consoleOut(
+            updateSettings(
+              "correctTypeErrorsEnabled",
+              "Automatická chybovost byla",
+              "povolena",
+              "zakázána"
+            )
+          );
         } else if (e.shiftKey && e.key == "ArrowUp") {
           settings.correctTypeErrors++;
           consoleOut("Pravděpodobnost chybovosti byla navýšena o 1");
@@ -287,7 +370,14 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
             } else if (e.ctrlKey && e.keyCode == "39") {
               document.getElementById("nextSnap").click();
             } else if (e.ctrlKey && e.key == "*") {
-              console(updateSettings("autoNext", "Automatické přepnutí snímku po dokončení bylo", "povoleno", "zakázáno"));
+              consoleOut(
+                updateSettings(
+                  "autoNext",
+                  "Automatické přepnutí snímku po dokončení bylo",
+                  "povoleno",
+                  "zakázáno"
+                )
+              );
             } else if (e.ctrlKey && e.altKey) {
               document.getElementById("repeatSnap").click();
             } else if (e.ctrlKey && e.keyCode == "32") {
@@ -325,14 +415,16 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
         checkKey();
       }
       function checkKey() {
-        const error = document.getElementById("correction").innerText.replace(/\s+/g, "").length;
+        const error = document
+          .getElementById("correction")
+          .innerText.replace(/\s+/g, "").length;
         if (error > errorsTemp) {
           errors++;
           errorsTemp++;
         }
         sentence = document.getElementById("original").innerText;
-        if (settings.autoNext && sentence.includes("Počet chyb:")) {
-          document.getElementById("nextSnap").click();
+        if (sentence.includes("Počet chyb:")) {
+          if (settings.autoNext) document.getElementById("nextSnap").click();
         } else {
           paper = document.getElementById("caret").innerText;
           correct = "ANO";
@@ -342,14 +434,17 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
           }
           index++;
           position++;
-          if (
-            (sentence[position] == "¶" && e.key == "Enter") ||
-            (sentence[position] == "—" && e.key == "-") ||
-            e.key == "F5" ||
-            e.key == "F12"
-          )
-            return true;
           if (sentence[position] != e.key) {
+            trueErrors++;
+            if (
+              (sentence[position] == "¶" && e.key == "Enter") ||
+              (sentence[position] == "—" && e.key == "-") ||
+              e.key == "F5" ||
+              e.key == "F12"
+            ) {
+              trueErrors--;
+              return true;
+            }
             index--;
             position--;
             if (settings.correctType) {
@@ -411,7 +506,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
     document.getElementById("corrMode").addEventListener("click", function () {
       resetPage();
       consoleOut("");
-    })
+    });
   } else if (catUrl == "grp") {
     document
       .getElementById("forwardText")
@@ -435,16 +530,37 @@ function checkUpdates() {
   const xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
-      if (this.responseText == "update") {
-        consoleOut("Je k dispozici nová verze KeySniperu, stáhnout jí můžete zde: https://github.com/vojtektomascz/keysniper");
-      } else if (this.responseText == "ok") {
-        consoleOut("Používáte nejnovější verzi KeySniperu");
-      } else {
-        consoleOut("Nepodařilo se připojit k aktualizačnímu serveru, tudíž nemohly být ověřeny nové aktualizace.");
+      try {
+        const response = JSON.parse(this.responseText);
+        if (response.status == "update") {
+          consoleOut(
+            "Je k dispozici nová verze KeySniperu (" +
+              response.latestversion +
+              "), stáhnout jí můžete zde: https://github.com/vojtektomascz/keysniper"
+          );
+        } else if (response.status == "ok") {
+          consoleOut(
+            "Používáte nejnovější verzi KeySniperu (" + core.version + ")"
+          );
+        } else {
+          consoleOut("Nepodařilo se ověřit nové aktualizace.");
+        }
+      } catch {
+        consoleOut(
+          "Nepodařilo se připojit k aktualizačnímu serveru, tudíž nemohly být ověřeny nové aktualizace."
+        );
       }
     }
-  }
-  xhttp.open("GET", core.updateServer + "?project=keysniper&version=" + core.version, true);
+  };
+  xhttp.open(
+    "GET",
+    core.updateServer +
+      "?action=check&project=keysniper&channel=" +
+      core.updateChannel +
+      "&version=" +
+      core.version,
+    true
+  );
   xhttp.send();
 }
 checkUpdates();
