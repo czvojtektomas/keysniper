@@ -12,7 +12,7 @@ const settings = {
   autoNext: false, // automatické přepnutí po dokončení
   autoRepeat: false, // automatické opakování při chybě
   correctType: false, // bezchybné psaní
-  correctTypeErrors: 10, // chybovost při bezchybném psaní (číslo větší než 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
+  correctTypeErrors: 10, // chybovost při bezchybném psaní (číslo > 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
   correctTypeErrorsEnabled: false, // zapnutí/vypnutí chybovosti
   rewrite: false, // přepisování chybných znaků při bezchybném psaní - v přípravě
   autoRewrite: false, // automatické přepisování chybných znaků při bezchybném psaní - v přípravě
@@ -83,6 +83,54 @@ function showHelp() {
        `);
   }
 }
+/*
+function buildKeyshortcuts(element, content, id) {
+  document.getElementById(element).innerHTML += '<br><span class="ks-item">' + content + '</span>';
+}
+buildKeyshortcuts("prevSnap", "(Ctrl + ←)");
+buildKeyshortcuts("nextSnap", "(Ctrl + →)");
+buildKeyshortcuts("repeatSnap", "(Ctrl + Alt)");
+document.getElementsByTagName("tr")[5].innerHTML += `
+<td>
+  <div class="cntRibbonborder">
+    <table cellspacing="0" cellpadding="0" border="0">
+      <tbody><tr>
+            <td class="cdchutopl" width="2"></td>
+            <td class="cdchutopc"><div></div></td>
+            <td class="cdchutopr" width="2"></td></tr>
+            <tr valign="middle" height="74">
+            <td class="cdchumidl" width="1"><div></div></td>
+            <td class="cdchumidc" onmouseover="this.className='cdchumidcover'" onmouseout="this.className='cdchumidc'" width="120">
+
+            <table width="100%" height="92" cellspacing="0">
+            <tbody><tr><td class="buttonlar">
+
+            <table height="100%" align="center">        
+            <tbody><tr><td colspan="3" align="right"> <select id="fontFamily" class="fontselect"><option>Courier New</option>                                                             
+                                     <option selected="">Consolas</option></select></td></tr>                 
+            <tr><td id="fontBold" class="button_small_set" width="24" height="16" align="center">                
+            <a><img src="img/button/fontBold.png" alt=" " width="16" height="16" border="0"></a>                                
+            </td><td id="fontItalic" class="button_small" width="24" height="16" align="center">                
+            <a><img src="img/button/fontItalic.png" alt=" " width="16" height="16" border="0"></a>                                
+            </td>          
+            <td align="right"> <select id="fontSize" class="fontselect"><option>12</option><option>14</option><option>16</option><option>18</option><option>20</option><option>22</option><option>24</option><option selected="">26</option></select></td></tr>              
+            </tbody></table>
+
+            </td></tr>
+            <tr><td class="kategori_foot" align="center">KeySniper</td></tr>
+            </tbody></table>
+            </td>
+            <td class="cdchumidr" width="1"><div></div></td>
+            </tr>
+            <tr valign="top"><td class="cdchubotl" width="2">
+            </td><td class="cdchubotc"><div></div></td>
+            <td class="cdchubotr" width="2"></td>
+            </tr>
+            </tbody></table>
+
+            </div>
+            </td>
+`; */
 function sendSnap(username, lection, sublection, snap, speed, erroneous) {
   if (settings.ksEnabled) {
     if (
