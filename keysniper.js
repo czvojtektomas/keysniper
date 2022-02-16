@@ -91,7 +91,7 @@ buildKeyshortcuts("prevSnap", "(Ctrl + ←)");
 buildKeyshortcuts("nextSnap", "(Ctrl + →)");
 buildKeyshortcuts("repeatSnap", "(Ctrl + Alt)");
 document.getElementsByTagName("tr")[5].innerHTML += `
-<td>
+<td class="ks-item">
   <div class="cntRibbonborder">
     <table cellspacing="0" cellpadding="0" border="0">
       <tbody><tr>
