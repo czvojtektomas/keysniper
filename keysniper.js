@@ -240,7 +240,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
         position +
         "  |  Index: " +
         index +
-        "  |  Počet chyb před opravou: " +
+        "  |  Počet chyb před opravou (přibližně): " +
         trueErrors +
         "  |  Počet chyb po opravě: " +
         errors
