@@ -63,7 +63,7 @@ function showHelp() {
         @@@@*(               @@@@                *,@@@           Ctrl Z          povolení/zakázání automatického opakování při chybě
         @@@@*%             @@@@@@@@@@@@@         (,@@@           Ctrl ,          povolení/zakázání bezchybného psaní
         @@@@*%            @@@@@@@@@#  @          (,@@@           Ctrl Q          povolení/zakázání zobrazování chyb v titulku stránky
-        @@@@*%            @@@@@,                 (,@@@           Ctrl *          povolení/zákázání automatického přepnutí snímku na následující po dokončení
+        @@@@*%            @@@@@,                 (,@@@           Ctrl *          povolení/zakázání automatického přepnutí snímku na následující po dokončení
         @@@@*%            @@@@@@                 (,@@@           Ctrl /          povolení/zakázání automatické chybovosti při bezchybném psaní
         @@@@*%           @@@@ @@@@               (,@@@           Ctrl Space      odeslání aktuálního snímku
         @@@@*%           @@@    @@@              (,@@@           Shift ↑         zvýšení pravděpodobnosti chyby během bezchybného psaní o 1
@@ -74,7 +74,7 @@ function showHelp() {
         @@@@**%**//****,,,,,......,,,,,,,****/**%,*@@@           Ctrl A          povolení/zakázání klávesových zkratek
         @@@@#***&//****,,,,,.......,,,,,,****/%**,#@@@           Ctrl ;          zkontrolovat aktualizace
         @@@@,@##*,,,,,,,.....     .....,,,,,,,*##@,@@@           Ctrl *          
-        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           Ctrk /      
+        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           Ctrl /      
           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@             
             @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@               
               @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                 
@@ -83,54 +83,222 @@ function showHelp() {
        `);
   }
 }
-/*
-function buildKeyshortcuts(element, content, id) {
-  document.getElementById(element).innerHTML += '<br><span class="ks-item">' + content + '</span>';
+function updateDisplay(item, name, t, f) {
+  const element = document.getElementById(item);
+  let syntax = name + " ";
+  if (element.style.display == "none") {
+    element.style.display = "";
+    syntax += t;
+  } else {
+    element.style.display = "none";
+    syntax += f;
+  }
+  return syntax;
 }
-buildKeyshortcuts("prevSnap", "(Ctrl + ←)");
-buildKeyshortcuts("nextSnap", "(Ctrl + →)");
-buildKeyshortcuts("repeatSnap", "(Ctrl + Alt)");
-document.getElementsByTagName("tr")[5].innerHTML += `
-<td class="ks-item">
+function updateSettings(item, name, t, f) {
+  settings[item] = !settings[item];
+  let syntax = name + " ";
+  if (settings.item) {
+    syntax += t;
+  } else {
+    syntax += f;
+  }
+  return syntax;
+}
+function showAlert(message) {
+  if (settings.consoleOutput) console.log("[KS] " + message);
+  if (settings.showAlerts) document.getElementById("alertMess").innerText = message;
+}
+const items = ["prevSnap", "nextSnap", "repeatSnap"];
+const shortcuts = ["Ctrl + ←", "Ctrl + →", "Ctrl + Alt"];
+for (let i = 0; i < items.length; i++) document.getElementById(items[i]).innerHTML += '<br><span class="ks-item">(' + shortcuts[i] + ')</span>';
+const fonts = ["Arial", "Times New Roman", "Comic Sans MS", "Verdana", "Helvetica", "Tahoma", "Trebuchet MS", "Georgia", "Garamond", "Brush Script MT", "Gill Sans", "Impact", "Oldtown", "Blippo", "Florence", "Parkavenue", "Lucida Sans", "Candara", "Futara", "Geneva", "Optima", "Avanta Garde", "Cambria", "Didot", "Garamond", "Goudy Old Style", "Hoefler Text", "Lucida Bright", "Palatino", "Perpetua", "Baskerville", "Courier", "Lucida Console", "Monaco"];
+for (let i = 0; i < fonts.length; i++) document.getElementById("fontFamily").innerHTML += '<option class="ks-item">' + fonts[i] + '</option>';
+document.getElementsByTagName("tr")[54].innerHTML += '<td><input id="fontColor" type="color" style="width: 55px" value="' + document.getElementById("copy").style.color + '"></td>';
+document.getElementById("fontColor").addEventListener("change", function() {
+  document.getElementById("copy").style.color = document.getElementById("fontColor").value;
+});
+document.getElementById("fontSize").innerHTML = "";
+for (let i = 2; i < 130; i++) if (i % 2 == 0) document.getElementById("paperContainer").style.fontSize == i + "px" ? document.getElementById("fontSize").innerHTML += '<option class="ks-item" selected="">' + i + '</option>' : document.getElementById("fontSize").innerHTML += '<option class="ks-item">' + i + '</option>';
+const underline = document.createElement("td");
+underline.className = "button_small ks-item";
+underline.id = "fontUnderline";
+underline.width = 24;
+underline.height = 16;
+underline.align = "center";
+underline.innerHTML = `<a><img src="img/button/fontUnderline.png" alt=" " width="16" height="16" border="0"></a>`;
+document.getElementsByTagName("td")[125].before(underline);
+document.getElementById("fontUnderline").addEventListener("click", function() {
+  if (this.className == "button_small ks-item") {
+    this.className = "button_small_set ks-item";
+    document.getElementById("paperContainer").style.textDecoration = "underline";
+  } else {
+    this.className = "button_small ks-item";
+    document.getElementById("paperContainer").style.textDecoration = "none";
+  }
+});
+const ksMenu = document.createElement("div");
+ksMenu.className = "ks-item";
+ksMenu.innerHTML = `
   <div class="cntRibbonborder">
     <table cellspacing="0" cellpadding="0" border="0">
-      <tbody><tr>
-            <td class="cdchutopl" width="2"></td>
-            <td class="cdchutopc"><div></div></td>
-            <td class="cdchutopr" width="2"></td></tr>
-            <tr valign="middle" height="74">
-            <td class="cdchumidl" width="1"><div></div></td>
-            <td class="cdchumidc" onmouseover="this.className='cdchumidcover'" onmouseout="this.className='cdchumidc'" width="120">
-
+      <tbody>
+        <tr>
+          <td class="cdchutopl" width="2"></td>
+          <td class="cdchutopc"><div></div></td>
+          <td class="cdchutopr" width="2"></td>
+        </tr>
+        <tr valign="middle" height="74">
+          <td class="cdchumidl" width="1"><div></div></td>
+          <td class="cdchumidc" onmouseover="this.className='cdchumidcover'" onmouseout="this.className='cdchumidc'" width="125">
             <table width="100%" height="92" cellspacing="0">
-            <tbody><tr><td class="buttonlar">
+              <tbody>
+                <tr>
+                  <td class="buttonlar">
+                    <table height="100%" align="center">        
+                      <tbody>
+                        <tr></tr>
+                        <tr>
+                          <td id="atfMenu">
+                            <input class="tabletxtbox" type="checkbox" checked="">
+                          </td>
+                          <td class="textitem">ATF lišta</td>
+                        </tr>
+                        <tr>
+                          <td id="lectionInfo">
+                            <input class="tabletxtbox" type="checkbox" checked="">
+                          </td>
+                          <td class="textitem">Informace o lekci</td>
+                        </tr>    
+                        <tr>
+                          <td id="keyboardHands">
+                            <input class="tabletxtbox" type="checkbox" checked="">
+                          </td>
+                          <td class="textitem">Klávesnice a ruce</td>
+                        </tr>             
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr><td class="kategori_foot" align="center">ATF Online</td></tr>
+              </tbody>
+            </table>
+          </td>
+          <td class="cdchumidr" width="1"><div></div></td>
+        </tr>
+        <tr valign="top"><td class="cdchubotl" width="2">
+          <td class="cdchubotc"><div></div></td>
+          <td class="cdchubotr" width="2"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+`;
+document.getElementsByTagName("tr")[5].appendChild(ksMenu);
+document.getElementById("atfMenu").addEventListener("change", function() {
+  if (this.checked) {
+    document.getElementById("cdribbon").style.display = "";
+    this.checked = false;
+  } else {
+    document.getElementById("cdribbon").style.display = "none";
+    this.checked = true;
+  }
+});
+document.getElementById("lectionInfo").addEventListener("change", function() {
+  if (this.checked) {
+    document.getElementById("cdinfopanel").style.display = "";
+    this.checked = false;
+  } else {
+    document.getElementById("cdinfopanel").style.display = "none";
+    this.checked = true;
+  }
+});
+document.getElementById("keyboardHands").addEventListener("change", function() {
+  if (this.checked) {
+    document.getElementById("board").style.display = "";
+    this.checked = false;
+  } else {
+    document.getElementById("board").style.display = "none";
+    this.checked = true;
+  }
+});
+const space = document.createElement("td");
+space.classList = "ks-item";
+space.width = 2;
+document.getElementsByTagName("tr")[5].appendChild(space);
+const ks = document.createElement("td");
+ks.classList = "ks-item";
+ks.innerHTML = `
+<div class="cntRibbonborder">
+    <table cellspacing="0" cellpadding="0" border="0">
+      <tbody>
+        <tr>
+          <td class="cdchutopl" width="2"></td>
+          <td class="cdchutopc"><div></div></td>
+          <td class="cdchutopr" width="2"></td>
+        </tr>
+        <tr valign="middle" height="74">
+          <td class="cdchumidl" width="1"><div></div></td>
+          <td class="cdchumidc" onmouseover="this.className='cdchumidcover'" onmouseout="this.className='cdchumidc'" width="120">
+            <table width="100%" height="92" cellspacing="0">
+              <tbody>
+                <tr>
+                  <td class="buttonlar">
+                    <table height="100%" align="center">        
+                      <tbody>
+                        <tr></tr>
+                        <tr>
+                          <td id="ksMenu">
+                            <input class="tabletxtbox" type="checkbox" checked="">
+                          </td>
+                          <td class="textitem">KeySniper menu</td>
+                        </tr>
+                        <tr>
+                          <td id="notifications">
+                            <input class="tabletxtbox" type="checkbox" checked="">
+                          </td>
+                          <td class="textitem">Oznámení</td>
+                        </tr>
+                        <tr>
+                          <td id="extensions">
+                            <input class="tabletxtbox" type="checkbox" checked="">
+                          </td>
+                          <td class="textitem">Doplňky</td>
+                        </tr>         
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                <tr><td class="kategori_foot" align="center">KeySniper</td></tr>
+              </tbody>
+            </table>
+          </td>
+          <td class="cdchumidr" width="1"><div></div></td>
+        </tr>
+        <tr valign="top"><td class="cdchubotl" width="2">
+          <td class="cdchubotc"><div></div></td>
+          <td class="cdchubotr" width="2"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+`;
+document.getElementsByTagName("tr")[5].appendChild(ks);
+const alertPanel = document.createElement("table");
+alertPanel.className = "ks-item";
+alertPanel.id = "cdinfopanel";
+alertPanel.width = "100%";
+alertPanel.align = "center";
+alertPanel.innerHTML = `
+  <tbody>
+    <tr>
+      <td id="alertMess" style="color: black;" valign="middle" align="center"><strong></strong></td>         
+    </tr>           
+  </tbody>
+`;
+document.getElementById("paperContainer").before(alertPanel);
 
-            <table height="100%" align="center">        
-            <tbody><tr><td colspan="3" align="right"> <select id="fontFamily" class="fontselect"><option>Courier New</option>                                                             
-                                     <option selected="">Consolas</option></select></td></tr>                 
-            <tr><td id="fontBold" class="button_small_set" width="24" height="16" align="center">                
-            <a><img src="img/button/fontBold.png" alt=" " width="16" height="16" border="0"></a>                                
-            </td><td id="fontItalic" class="button_small" width="24" height="16" align="center">                
-            <a><img src="img/button/fontItalic.png" alt=" " width="16" height="16" border="0"></a>                                
-            </td>          
-            <td align="right"> <select id="fontSize" class="fontselect"><option>12</option><option>14</option><option>16</option><option>18</option><option>20</option><option>22</option><option>24</option><option selected="">26</option></select></td></tr>              
-            </tbody></table>
 
-            </td></tr>
-            <tr><td class="kategori_foot" align="center">KeySniper</td></tr>
-            </tbody></table>
-            </td>
-            <td class="cdchumidr" width="1"><div></div></td>
-            </tr>
-            <tr valign="top"><td class="cdchubotl" width="2">
-            </td><td class="cdchubotc"><div></div></td>
-            <td class="cdchubotr" width="2"></td>
-            </tr>
-            </tbody></table>
-
-            </div>
-            </td>
-`; */
 function sendSnap(username, lection, sublection, snap, speed, erroneous) {
   if (settings.ksEnabled) {
     if (
@@ -297,28 +465,6 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
   document.addEventListener("keydown", function (e) {
     if (settings.ksEnabled) {
       if (settings.keyboardShortcuts) {
-        function updateDisplay(item, text, t, f) {
-          const itemID = document.getElementById(item);
-          let syntax = text + " ";
-          if (itemID.style.display == "none") {
-            itemID.style.display = "";
-            syntax += t;
-          } else {
-            itemID.style.display = "none";
-            syntax += f;
-          }
-          return syntax;
-        }
-        function updateSettings(value, text, t, f) {
-          settings[value] = !settings[value];
-          let syntax = text + " ";
-          if (settings[value]) {
-            syntax += t;
-          } else {
-            syntax += f;
-          }
-          return syntax;
-        }
         if (e.ctrlKey && e.shiftKey) {
           settings.showTab = false;
           showTitle();
