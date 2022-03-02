@@ -105,9 +105,6 @@ function updateSettings(item, name, t, f) {
   }
   return syntax;
 }
-function consoleOut(message) {
-  if (settings.consoleOutput) console.log("[KS] " + message);
-}
 /*
 function showAlert(message) {
   if (settings.consoleOutput) console.log("[KS] " + message);
