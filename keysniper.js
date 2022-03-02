@@ -105,6 +105,10 @@ function updateSettings(item, name, t, f) {
   }
   return syntax;
 }
+function consoleOut(message) {
+  if (settings.consoleOutput) console.log("[KS] " + message);
+}
+/*
 function showAlert(message) {
   if (settings.consoleOutput) console.log("[KS] " + message);
   if (settings.showAlerts) document.getElementById("alertMess").innerText = message;
@@ -297,7 +301,7 @@ alertPanel.innerHTML = `
   </tbody>
 `;
 document.getElementById("paperContainer").before(alertPanel);
-
+*/
 
 function sendSnap(username, lection, sublection, snap, speed, erroneous) {
   if (settings.ksEnabled) {
