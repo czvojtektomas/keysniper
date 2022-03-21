@@ -6,7 +6,6 @@
 
 // výchozí nastavení
 const settings = {
-  ksEnabled: true, // zapnutí/vypnutí všech funkcí KeySniperu
   consoleOutput: true, // výstup příkazů do konzole
   keyboardShortcuts: true, // klávesové zkratky
   autoNext: false, // automatické přepnutí po dokončení
@@ -17,6 +16,7 @@ const settings = {
   rewrite: false, // přepisování chybných znaků při bezchybném psaní - v přípravě
   autoRewrite: false, // automatické přepisování chybných znaků při bezchybném psaní - v přípravě
   showTab: false, // zobrazování chyb, rychlosti a času v titulku stránky
+  askBeforeSend: true, // zeptat se na rychlost a chybovost při falešným odeslání snímku
   sendSnapErrorsFrom: 0.0, // náhodná chybovost falešně odeslaného snímku (od)
   sendSnapErrorsTo: 0.0, // náhodná chybovost falešně odeslaného snímku (do)
   sendSnapSpeedFrom: 200, // náhodná rychlost falešně odeslaného snímku (od)
@@ -34,11 +34,10 @@ const core = {
 
 // kód
 function consoleOut(message) {
-  if (settings.consoleOutput && settings.ksEnabled)
+  if (settings.consoleOutput)
     console.log("[KS] " + message);
 }
 function showHelp() {
-  if (settings.ksEnabled) {
     console.log(`
          _  __           _____       _                 
         | |/ /          / ____|     (_)                             
@@ -81,7 +80,6 @@ function showHelp() {
                 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                   
                   @@@@@@@@@@@@@@@@@@@@@@@@@@               
        `);
-  }
 }
 function updateDisplay(item, name, t, f) {
   const element = document.getElementById(item);
@@ -105,10 +103,12 @@ function updateSettings(item, name, t, f) {
   }
   return syntax;
 }
+/*
 function showAlert(message) {
   if (settings.consoleOutput) console.log("[KS] " + message);
   if (settings.showAlerts) document.getElementById("alertMess").innerText = message;
 }
+
 const items = ["prevSnap", "nextSnap", "repeatSnap"];
 const shortcuts = ["Ctrl + ←", "Ctrl + →", "Ctrl + Alt"];
 for (let i = 0; i < items.length; i++) document.getElementById(items[i]).innerHTML += '<br><span class="ks-item">(' + shortcuts[i] + ')</span>';
@@ -297,10 +297,9 @@ alertPanel.innerHTML = `
   </tbody>
 `;
 document.getElementById("paperContainer").before(alertPanel);
-
+*/
 
 function sendSnap(username, lection, sublection, snap, speed, erroneous) {
-  if (settings.ksEnabled) {
     if (
       username == undefined ||
       isNaN(lection) ||
@@ -323,10 +322,14 @@ function sendSnap(username, lection, sublection, snap, speed, erroneous) {
             (settings.sendSnapErrorsFrom - settings.sendSnapErrorsTo) +
             settings.sendSnapErrorsTo
         );
-      if (isNaN(speed) || isNaN(erroneous))
+      if (isNaN(speed) || isNaN(erroneous)) {consoleOut(
+        "Snímek se nepodařilo odeslat - zadali jste neplatnou rychlost nebo chybovost!"
+      );
         consoleOut(
           "Snímek se nepodařilo odeslat - zadali jste neplatnou rychlost nebo chybovost!"
         );
+        return;
+      }
       const xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
@@ -359,7 +362,6 @@ function sendSnap(username, lection, sublection, snap, speed, erroneous) {
         true
       );
       xhttp.send();
-    }
   }
 }
 const pageUrl = new URL(window.location).searchParams.get("page");
@@ -392,7 +394,6 @@ function changeIdentity(username) {
 if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
   let index, position, positionTemp, errors, errorsTemp, trueErrors, correct;
   function resetPage() {
-    if (settings.ksEnabled) {
       index = -1;
       position = -1;
       positionTemp = -1;
@@ -400,7 +401,6 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
       errorsTemp = 0;
       trueErrors = 0;
       showTitle();
-    }
   }
   function showTitle() {
     settings.showTab
@@ -463,13 +463,13 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
     );
   });
   document.addEventListener("keydown", function (e) {
-    if (settings.ksEnabled) {
       if (settings.keyboardShortcuts) {
         if (e.ctrlKey && e.shiftKey) {
-          settings.showTab = false;
-          showTitle();
-          console.clear();
-          settings.ksEnabled = false;
+          updateSettings(
+            "askBeforeSend", 
+            "Dotázání se na rychlost a chybovost před odesláním bylo", 
+            "povoleno", 
+            "zakázáno");
         } else if (e.ctrlKey && e.key == "Delete") {
           showHelp();
         } else if (e.ctrlKey && e.key == "ArrowUp") {
@@ -584,14 +584,25 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
               lection > 9
                 ? (snap = parseInt(mess.replace(/[^0-9]/g, "")[2]))
                 : (snap = parseInt(mess.replace(/[^0-9]/g, "")[1]));
-              sendSnap(
-                eduProfile.userName,
-                lection,
-                sublection,
-                snap,
-                null,
-                null
-              );
+              if (settings.askBeforeSend) {
+                sendSnap(
+                  eduProfile.userName,
+                  lection,
+                  sublection,
+                  snap,
+                  parseInt(prompt("Zadejte rychlost:")),
+                  parseInt(prompt("Zadejte chybovost:"))
+                );
+              } else {
+                sendSnap(
+                  eduProfile.userName,
+                  lection,
+                  sublection,
+                  snap,
+                  null,
+                  null
+                );
+              }
             } else {
               checkKey();
             }
@@ -661,8 +672,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
             : (positionTemp = position);
         }
       }
-    }
-  });
+    });
   if (catUrl == "edu" || pageUrl == "edu-typing") {
     document.getElementById("prevSnap").addEventListener("click", function () {
       newSnap("předchozí");
