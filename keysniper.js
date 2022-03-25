@@ -1,8 +1,8 @@
 /**
- * KeySniper (verze 1.0.4)
+ * KeySniper (verze 2.0.1)
  * © Tomáš Vojtek 2022
  * https://github.com/vojtektomascz/keysniper
- */
+*/
 
 // výchozí nastavení
 const settings = {
@@ -13,73 +13,85 @@ const settings = {
   correctType: false, // bezchybné psaní
   correctTypeErrors: 10, // chybovost při bezchybném psaní (číslo > 0 = zapnuto - čím vyšší, tím menší pravděpodobnost chyby)
   correctTypeErrorsEnabled: false, // zapnutí/vypnutí chybovosti
-  rewrite: false, // přepisování chybných znaků při bezchybném psaní - v přípravě
-  autoRewrite: false, // automatické přepisování chybných znaků při bezchybném psaní - v přípravě
   showTab: false, // zobrazování chyb, rychlosti a času v titulku stránky
-  askBeforeSend: true, // zeptat se na rychlost a chybovost při falešným odeslání snímku
+  askBeforeSend: true, // zeptat se na rychlost a chybovost při falešném odeslání snímku
   sendSnapErrorsFrom: 0.0, // náhodná chybovost falešně odeslaného snímku (od)
   sendSnapErrorsTo: 0.0, // náhodná chybovost falešně odeslaného snímku (do)
   sendSnapSpeedFrom: 200, // náhodná rychlost falešně odeslaného snímku (od)
-  sendSnapSpeedTo: 350, // náhodná rychlost falešně odeslaného snímku (do)
-};
-const core = {
-  version: "1.0.4", // verze KeySniperu
-  updateChannel: "stable", // aktualizační kanál
-  updateServer: "https://vojtek.php5.cz/projects/updatechan/update.php", // aktualizační server
-  defaultChatServer: "https://vojtek.php5.cz/projects/keysniper/chat.php", // server pro chat
-  defaultFightServer: "https://vojtek.php5.cz/projects/keysniper/fight.php", // server pro fight
-  defaultBrowserSite: "https://www.bing.com", // výchozí webová stránka pro integrovaný prohlížeč
-  defaultFeedURL: "https://hn.cz/?p=000000_rss", // výchozí adresa pro RSS feed
+  sendSnapSpeedTo: 350 // náhodná rychlost falešně odeslaného snímku (do)
 };
 
-// kód
+// klávesové zkratky (Ctrl + ...)
+const shortcuts = {
+  atfMenu: ["skrytí/odkrytí ATF lišty", "ArrowUp"],
+  keyboardShow: ["skrytí/odkrytí virtuální klávesnice", "ArrowDown"],
+  nextSnap: ["přepnutí snímku na následující", "ArrowRight"],
+  prevSnap: ["přepnutí snímku na předchozí", "ArrowLeft"],
+  showHelp: ["zobrazení nápovědy", "Shift"]
+  
+};
+
+// jádro
+const core = {
+  version: "2.0.1", // verze KeySniperu
+  chatServer: "https://vojtek.php5.cz/projects/keysniper/chat.php", // server pro chat
+  fightServer: "https://vojtek.php5.cz/projects/keysniper/fight.php" // server pro fight
+};
+
+// výstup do konzole
 function consoleOut(message) {
   if (settings.consoleOutput)
     console.log("[KS] " + message);
 }
+
+// nápověda
 function showHelp() {
-    console.log(`
-         _  __           _____       _                 
-        | |/ /          / ____|     (_)                             
-        | ' / ___ _   _| (___  _ __  _ _ __  ___ _ __            KeySniper (verze ${
-          core.version
-        })
-        |  < / _ | | | ||___ || '_ || | '_ |/ _ | '__|           GitHub: https://github.com/vojtektomascz/keysniper
-        | . ||  __/ |_| |____) | | | | | |_)|  __/ |             © Tomáš Vojtek ${new Date().getFullYear()}
-        |_||_|___||__, |_____/|_| |_|_| .__/|___|_|              https://tomasvojtek.cz
-                   __/ |              | |              
-                  |___/               |_|              
-        
-                  @@@@@@@@@@@@@@@@@@@@@@@@@@                     KLÁVESOVÉ ZKRATKY:
-                @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                   Ctrl Shift      kompletní vypnutí veškerých funkcí KeySniperu
-              @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                 Ctrl ↑          skrytí/odkrytí ATF lišty
-            @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@               Ctrl ↓          skrytí/odkrytí virtuální klávesnice
-         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@              Ctrl Del        zobrazení nápovědy
-        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           Ctrl Alt        obnovení snímku
-        @@@@  ...                             ..   @@@           Ctrl ←          přepnutí snímku na předchozí
-        @@@@,.*                                 , .@@@           Ctrl →          přepnutí snímku na následující
-        @@@@,*                                   ,,@@@           Ctrl Enter      povolení/zakázání výstupu do konzole
-        @@@@*(               @@@@                *,@@@           Ctrl Z          povolení/zakázání automatického opakování při chybě
-        @@@@*%             @@@@@@@@@@@@@         (,@@@           Ctrl ,          povolení/zakázání bezchybného psaní
-        @@@@*%            @@@@@@@@@#  @          (,@@@           Ctrl Q          povolení/zakázání zobrazování chyb v titulku stránky
-        @@@@*%            @@@@@,                 (,@@@           Ctrl *          povolení/zakázání automatického přepnutí snímku na následující po dokončení
-        @@@@*%            @@@@@@                 (,@@@           Ctrl /          povolení/zakázání automatické chybovosti při bezchybném psaní
-        @@@@*%           @@@@ @@@@               (,@@@           Ctrl Space      odeslání aktuálního snímku
-        @@@@*%           @@@    @@@              (,@@@           Shift ↑         zvýšení pravděpodobnosti chyby během bezchybného psaní o 1
-        @@@@*%         /@@@      @@@             (,@@@           Shift ↓         snížení pravděpodobnosti chyby během bezchybného psaní o 1
-        @@@@*%       /@@          @@             (,@@@           Ctrl .          povolení/zakázání automatického přepisování chybných znaků  
-        @@@@*%                     @@@           (,@@@           Shift →         skrytí/odkrytí grafického rozhraní KeySniperu
-        @@@@*%**                               **(,@@@           Shift ←         skrytí/odkrytí widgetů
-        @@@@**%**//****,,,,,......,,,,,,,****/**%,*@@@           Ctrl A          povolení/zakázání klávesových zkratek
-        @@@@#***&//****,,,,,.......,,,,,,****/%**,#@@@           Ctrl ;          zkontrolovat aktualizace
-        @@@@,@##*,,,,,,,.....     .....,,,,,,,*##@,@@@           Ctrl *          
-        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           Ctrl /      
-          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@             
-            @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@               
-              @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                 
-                @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                   
-                  @@@@@@@@@@@@@@@@@@@@@@@@@@               
-       `);
+  let text = `
+       _  __           _____       _
+      | |/ /          / ____|     (_)
+      | ' / ___ _   _| (___  _ __  _ _ __  ___ _ __
+      |  < / _ | | | ||___ || '_ || | '_ |/ _ | '__|
+      | . ||  __/ |_| |____) | | | | | |_)|  __/ |
+      |_||_|___||__, |_____/|_| |_|_| .__/|___|_|
+                 __/ |              | |
+                |___/               |_|
+
+        //////  KeySniper ${core.version}  \\\\\\
+    ////  © Tomáš Vojtek ${new Date().getFullYear()} \\\\
+    /// Web: https://tomasvojtek.cz \\\
+// GitHub: https://github.com/vojtektomascz/keysniper \\
+
+
+KLÁVESOVÉ ZKRATKY:    
+Ctrl Shift      kompletní vypnutí veškerých funkcí KeySniperu
+Ctrl ↑          skrytí/odkrytí ATF lišty
+Ctrl ↓          skrytí/odkrytí virtuální klávesnice
+Ctrl Del        zobrazení nápovědy
+Ctrl Alt        obnovení snímku
+Ctrl ←          přepnutí snímku na předchozí
+Ctrl →          přepnutí snímku na následující
+Ctrl Enter      povolení/zakázání výstupu do konzole
+Ctrl Z          povolení/zakázání automatického opakování při chybě
+Ctrl ,          povolení/zakázání bezchybného psaní
+Ctrl Q          povolení/zakázání zobrazování chyb v titulku stránky
+Ctrl *          povolení/zakázání automatického přepnutí snímku na následující po dokončení
+Ctrl /          povolení/zakázání automatické chybovosti při bezchybném psaní
+Ctrl Space      odeslání aktuálního snímku
+Shift ↑         zvýšení pravděpodobnosti chyby během bezchybného psaní o 1
+Shift ↓         snížení pravděpodobnosti chyby během bezchybného psaní o 1
+Ctrl .          povolení/zakázání automatického přepisování chybných znaků  
+Shift →         skrytí/odkrytí grafického rozhraní KeySniperu
+Shift ←         skrytí/odkrytí widgetů
+Ctrl A          povolení/zakázání klávesových zkratek
+Ctrl ;          zkontrolovat aktualizace
+Ctrl *          
+Ctrl /   
+`;
+  /*
+  for item in shortcuts { 
+    text += `Ctrl ${shortcuts.item[1]}       ${shortcuts.item[0]}`
+  }*/
+console.log(text);
 }
 function updateDisplay(item, name, t, f) {
   const element = document.getElementById(item);
@@ -556,7 +568,7 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
           if (settings.correctTypeErrors <= 0) settings.correctTypeErrors++;
           consoleOut("Pravděpodobnost chybovosti byla snížena o 1");
         } else if (e.ctrlKey && e.key == ";") {
-          checkUpdates();
+          
         } else {
           if (catUrl == "edu" || pageUrl == "edu-typing") {
             if (e.ctrlKey && e.keyCode == "37") {
@@ -730,42 +742,4 @@ if (catUrl == "edu" || pageUrl == "edu-typing" || catUrl == "grp") {
     'KeySniper funguje pouze na stránkách "Výuka CS Qwertz" a "Skupiny"'
   );
 }
-function checkUpdates() {
-  const xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      try {
-        const response = JSON.parse(this.responseText);
-        if (response.status == "update") {
-          consoleOut(
-            "Je k dispozici nová verze KeySniperu (" +
-              response.latestversion +
-              "), stáhnout jí můžete zde: https://github.com/vojtektomascz/keysniper"
-          );
-        } else if (response.status == "ok") {
-          consoleOut(
-            "Používáte nejnovější verzi KeySniperu (" + core.version + ")"
-          );
-        } else {
-          consoleOut("Nepodařilo se ověřit nové aktualizace.");
-        }
-      } catch {
-        consoleOut(
-          "Nepodařilo se připojit k aktualizačnímu serveru, tudíž nemohly být ověřeny nové aktualizace."
-        );
-      }
-    }
-  };
-  xhttp.open(
-    "GET",
-    core.updateServer +
-      "?action=check&project=keysniper&channel=" +
-      core.updateChannel +
-      "&version=" +
-      core.version,
-    true
-  );
-  xhttp.send();
-}
-checkUpdates();
 consoleOut("KeySniper byl úspěšně načten!");
