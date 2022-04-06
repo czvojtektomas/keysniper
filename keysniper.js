@@ -334,7 +334,7 @@ KLÁVESOVÉ ZKRATKY:
             errorsTemp++;
           }
           sentence = document.getElementById("original").innerText;
-          if (sentence.includes("Počet chyb:")) {
+          if (sentence.includes("Počet chyb:") && settings.autoNext) {
             if (catUrl == "edu" || pageUrl == "edu-typing") {
               document.getElementById("nextSnap").click();
             } else if (catUrl == "rss") {
