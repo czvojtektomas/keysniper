@@ -345,7 +345,7 @@ KLÁVESOVÉ ZKRATKY:
               index--;
               position--;
               if (settings.correctType) {
-                if (settings.correctTypeErrors <= 0) correctTypeErrors = 1;
+                if (settings.correctTypeErrors <= 0) settings.correctTypeErrors = 1;
                 let rand;
                 settings.correctTypeErrorsEnabled ? (rand = Math.trunc(Math.random() * settings.correctTypeErrors)) : (rand = 1);
                 if (rand > 0) {
