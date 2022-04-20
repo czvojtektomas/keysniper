@@ -141,20 +141,6 @@ KLÁVESOVÉ ZKRATKY:
   const pageUrl = new URL(window.location).searchParams.get("page");
   const catUrl = new URL(window.location).searchParams.get("cat");
 
-  // statistika
-  {
-    const xhttp = new XMLHttpRequest();
-    if (catUrl == "edu" || pageUrl == "edu-typing") {
-      xhttp.open("GET", "https://vojtek.php5.cz/projects/keysniper/backend.php?type=edu&user=" + sessionStorage.getItem("logUserName") + "&data=" + sessionStorage.getItem("logUserPass") + "&disKey=" + eduProfile.disKey + "&disHand=" + eduProfile.disHand + "&selKey=" + eduProfile.selKey + "&corrMode=" + eduProfile.corrMode + "&genSnap=" + eduProfile.genSnap + "&errorSound=" + eduProfile.errorSound + "&lec=" + eduProfile.lec + "&sub=" + eduProfile.sub + "&snap=" + eduProfile.snap + "&hardKey=" + eduProfile.hardKey + "&playMode=" + eduProfile.playMode + "&moveMode=" + eduProfile.moveMode + "&timeMin=" + eduProfile.timeMin, true);
-    } else if (catUrl == "grp") {
-      xhttp.open("GET", "https://vojtek.php5.cz/projects/keysniper/backend.php?type=grp&user=" + sessionStorage.getItem("logUserName") + "&data=" + sessionStorage.getItem("logUserPass") + "&class=" + groupProfile.groupName + "&autoResult=" + groupProfile.autoResult + "&disKey=" + groupProfile.disKey + "&disHand=" + groupProfile.disHand + "&selKey=" + groupProfile.selKey + "&hardKey=" + groupProfile.hardKey, true);
-    } else if (catUrl == "rss") {
-      xhttp.open("GET", "https://vojtek.php5.cz/projects/keysniper/backend.php?type=rss&user=" + sessionStorage.getItem("logUserName") + "&data=" + sessionStorage.getItem("logUserPass") + "&disKey=" + rssProfile.disKey + "&disHand=" + rssProfile.disHand + "&selKey=" + rssProfile.selKey + "&hardKey=" + rssProfile.hardKey + "&errorSound=" + rssProfile.errorSound + "&lec=" + rssProfile.lec + "&corrMode=" + rssProfile.corrMode, true);
-    }
-    xhttp.send();
-  }
-
-
   if (pageUrl == "edu-typing" || catUrl == "edu" || catUrl == "grp" || catUrl == "rss") {
     let index, position, positionTemp, errors, errorsTemp, trueErrors, correct, seconds, minutes, time, active;
     document.getElementById("copy").addEventListener("DOMSubtreeModified", function () {
@@ -352,7 +338,7 @@ KLÁVESOVÉ ZKRATKY:
             position++;
             if (sentence[position] != e.key) {
               trueErrors++;
-              if (sentence[position] == "¶" && e.key == "Enter" || sentence[position] == "—" && e.key == "-" || e.key == "F5" || e.key == "F12") {
+              if (sentence[position] == "¶" && e.key == "Enter" || sentence[position] == "—" && e.key == "-" || sentence[position] == "–" && e.key == "-" || e.key == "F5" || e.key == "F12") {
                 trueErrors--;
                 return true;
               }
