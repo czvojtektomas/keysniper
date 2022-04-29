@@ -142,9 +142,10 @@ KLÁVESOVÉ ZKRATKY:
   const catUrl = new URL(window.location).searchParams.get("cat");
 
   if (pageUrl == "edu-typing" || catUrl == "edu" || catUrl == "grp" || catUrl == "rss") {
-    let index, position, positionTemp, errors, errorsTemp, trueErrors, correct, seconds, minutes, time, active;
+    let index, position, positionTemp, errors, errorsTemp, trueErrors, correct, seconds, minutes, time, timer, active;
     document.getElementById("copy").addEventListener("DOMSubtreeModified", function () {
-      if (index == 0) {
+      if (index == 0 && !timer) {
+        timer = true;
         time = setInterval(function () {
           seconds++;
           if (seconds == 60) {
@@ -163,6 +164,7 @@ KLÁVESOVÉ ZKRATKY:
       errors = 0;
       errorsTemp = 0;
       trueErrors = 0;
+      timer = false;
       seconds = 0;
       minutes = 0;
       showTitle();
