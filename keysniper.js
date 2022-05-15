@@ -286,7 +286,7 @@ KLÁVESOVÉ ZKRATKY:
                 let sublection = parseInt(document.getElementById("eduSublection").value);
                 let snap;
                 lection > 9 ? (snap = parseInt(mess.replace(/[^0-9]/g, "")[2])) : (snap = parseInt(mess.replace(/[^0-9]/g, "")[1]));
-                settings.askBeforeSend ? sendSnap(eduProfile.userName, lection, sublection, snap, parseInt(prompt("Zadejte rychlost:")), parseFloat(prompt("Zadejte chybovost:"))) : sendSnap(eduProfile.userName, lection, sublection, snap, null, null);
+                settings.askBeforeSend ? sendSnap(eduProfile.userName, lection, sublection, snap, parseInt(prompt("Zadejte rychlost:")), parseFloat(prompt("Zadejte chybovost:").replace(",", ".")) : sendSnap(eduProfile.userName, lection, sublection, snap, null, null);
               } else if (e.key == shortcuts[13][1]) {
                 updateSettings("autoNext", "Přepnutí snímku na následující po dokončení bylo", "povoleno", "zakázáno");
               } else {
